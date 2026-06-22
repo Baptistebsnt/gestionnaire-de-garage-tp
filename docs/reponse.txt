@@ -1,0 +1,80 @@
+A. Questions de cours :
+
+1. IPC est le bridge de communication entre les deux processus (main et renderer), le renderer est isolé, il ne peut accéder qu'à l'api "window", donc l'ipc combiné avec le preload enregistré lors de l'ouverture de la fenetre, permet de register des fonctions qui seront utilisées pour communiquer avec le main process (définies par le main process).
+
+
+
+2. Le main a accès à node, le renderer affiche l'interface, le renderer est invoqué par le main process.
+
+
+
+3. Le package.json contient les metadata du projet, les dépendances, références aux scripts etc.
+main.js est l'entry point de l'application, celui qui a accès à node, et qui invoque les fenetres (renderers).
+preload.js est chargé avant le renderer, il permet de register des fonctions pour communiquer avec le main.
+le fichier de la page sert au renderer, c'est simplement l'ui qui est affiché.
+
+
+
+4. Le contextBridge est utilisé pour définir dans le preload, les fonctions qui seront injectées dans le window du renderer pour qu'il puisse communiqué avec le main process. S'il manque un handle dans le main process, ça ne fonctionnera pas. Et pour la partie nodeIntegration, si on le met en true, on donne la possibilité au renderer par exemple de spawn des child process, et donc de run du code au niveau système (code injection), donc à évier.
+
+
+
+5. Quelle est la différence entre invoke/handle et send/on ? Donnez un exemple d'usage pour chacun.
+Le invoke handle à le même comportement qu'une fonction classique, on définit un handle coté main process, on définit l'invoke côté preload de la window pour pouvoir l'appeler depuis le renderer, et ça fonctionne comme une fonction asynchrone qu'on peut await et qui nous retournera une réponse. Le send lui est event driven, on définit le "on" côté main process, et comme pour le invoke on définit le "send" dans le preload, et puis le renderer pourra envoyer des events au main process, donc du fire and forget, mais on peut aussi utiliser "sendSync" pour attendre une réponse du main process, mais ça bloque le renderer, à éviter.
+
+
+
+6. C'est quoi un « canal » dans l'IPC ? Quelle règle absolue le concerne ?
+Un canal est simplement une string pour définir une route, elle doit absolument être unique, et identique à la définition et l'appel. par exemple (ipcRenderer.invoke("canal1"...) et ipcMain.handle("canal1"...))
+
+B. Le bon outil pour le bon besoin :
+
+    La règle : 
+        Tu attends une réponse unique → invoke/handle
+        Le Main prévient spontanément ou envoie plusieurs fois → send/on
+
+1. 
+La page veut afficher la liste des voitures invoke/handle
+La page demande une donnée et attend une réponse.
+Flux request/response classique.
+
+2. 
+Sauvegarde terminée → afficher « Sauvegardé ✅ »
+send/on
+C'est le Main qui prévient la page de lui-même, sans que la page ait rien demandé.
+
+3.
+Clic « Supprimer » → savoir si ça a réussi
+invoke/handle
+La page déclenche une action et attend un retour (succès ou erreur).
+
+4.
+Import en cours → mettre à jour une barre de progression
+send/on
+Le Main envoie des événements répétés au fil du temps. invoke ne peut répondre qu'une seule fois — ici il faut plusieurs notifications successives.
+
+C. « Trouvez le bug » (le plus important)
+
+C1 — La page attend dans le videLe bug : ipcMain.handle('charger-voitures', ...) n'existe nulle part dans main.js. Le canal est invoqué côté renderer, mais personne n'écoute côté Main.Pourquoi ça bloque : invoke est une promesse — elle attend une réponse. Sans handle enregistré, la promesse ne se résout jamais. La page reste suspendue indéfiniment.Correction : Ajouter dans main.js un ipcMain.handle('charger-voitures', () => { ... }) qui retourne les données.
+
+C2 — Le bouton Ajouter ne fait rien
+Le bug : Le nom du canal ne correspond pas. Le preload invoque 'ajouter-voiture' mais le Main écoute 'ajout-voiture'.
+Pourquoi ça échoue : Les canaux IPC sont de simples chaînes comparées à l'identique. Une seule lettre de différence suffit à rompre la connexion — le handle ne sera jamais déclenché.
+Correction : Harmoniser le nom partout : choisir 'ajouter-voiture' ou 'ajout-voiture' et l'utiliser de façon identique dans le preload et dans le main.
+
+C3 — L'écran affiche [object Promise]
+Le bug : chargerVoitures() retourne une promesse (c'est un invoke), mais le code l'affecte directement à textContent sans l'await.
+Pourquoi ça affiche ça : JavaScript convertit l'objet Promise en chaîne de caractères pour l'injecter dans le DOM, ce qui donne littéralement [object Promise]. La vraie valeur n'est pas encore arrivée.
+Correction : Marquer la fonction englobante async et ajouter await devant l'appel, pour attendre que la promesse soit résolue avant d'écrire dans le DOM.
+
+C4 — window.electronAPI est undefined
+Le bug : webPreferences est absent du BrowserWindow. Sans cette option, aucun preload n'est chargé — donc contextBridge.exposeInMainWorld n'est jamais exécuté.
+Pourquoi c'est undefined : window.electronAPI est créé par le preload. Si le preload n'est pas déclaré et chargé via webPreferences: { preload: path.join(__dirname, 'preload.js') }, il n'existe tout simplement pas.
+Correction : Ajouter le bloc webPreferences avec le chemin absolu vers le preload (en utilisant path.join(__dirname, ...) pour être robuste à l'OS).
+
+C5 — Ça marche… mais c'est une faille
+Le principe violé : l'isolation des contextes et la séparation renderer / Main. Le cours enseigne que le renderer ne doit jamais avoir accès direct aux API Node.js.
+Le risque concret : Avec nodeIntegration: true et contextIsolation: false, n'importe quel script qui s'exécute dans la page — y compris du contenu chargé depuis une source externe ou injecté via une faille XSS — peut appeler require('fs'), require('child_process'), etc. Un simple script malveillant peut alors lire, écrire ou supprimer des fichiers sur la machine de l'utilisateur, ou exécuter des commandes système. C'est une faille critique sur une app desktop.
+La bonne approche : Activer contextIsolation: true, désactiver nodeIntegration, et passer par le preload + contextBridge pour n'exposer que les fonctions strictement nécessaires — c'est exactement le modèle invoke/handle des exercices précédents.
+
+D. Voir Schema.png

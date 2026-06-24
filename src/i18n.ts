@@ -1,0 +1,138 @@
+import { Lang } from "./types";
+
+const fr = {
+  nav_voitures: "Véhicules",
+  nav_catalogue: "Catalogue",
+  nav_caisse: "Caisse",
+  nav_ventes: "Ventes",
+
+  cat_title: "Catalogue produits",
+  cat_add: "Nouveau produit",
+  cat_search_ph: "Rechercher un produit...",
+  cat_empty: "Aucun produit",
+  cat_empty_sub: "Ajoutez votre premier produit.",
+  cat_name_ph: "Nom du produit",
+  cat_price_ph: "Prix (€)",
+  cat_edit_price: "Modifier le prix",
+  cat_new_price_ph: "Nouveau prix",
+
+  caisse_title: "Caisse",
+  caisse_products: "Produits",
+  caisse_cart: "Panier",
+  caisse_cart_empty: "Panier vide",
+  caisse_cart_empty_sub: "Sélectionnez des produits à gauche.",
+  caisse_total: "Total",
+  caisse_validate: "Valider la vente",
+  caisse_clear: "Vider",
+  caisse_no_products: "Aucun produit dans le catalogue.",
+  caisse_go_catalogue: "Aller au catalogue",
+
+  ventes_title: "Historique des ventes",
+  ventes_empty: "Aucune vente",
+  ventes_empty_sub: "Les ventes validées apparaîtront ici.",
+  ventes_today: "Aujourd'hui",
+  ventes_total_day: "Total du jour",
+  ventes_export_csv: "Exporter CSV",
+  ventes_export_pdf: "Imprimer PDF",
+  ventes_ticket: "Ticket",
+  ventes_articles: "article(s)",
+  ventes_detail_title: "Détail de la vente",
+  ventes_filter_all: "Toutes",
+  ventes_filter_today: "Aujourd'hui",
+
+  settings_title: "Paramètres",
+  settings_theme: "Affichage",
+  settings_theme_dark: "Sombre",
+  settings_theme_light: "Clair",
+  settings_lang: "Langue",
+  settings_lang_fr: "Français",
+  settings_lang_en: "English",
+
+  btn_cancel: "Annuler",
+  btn_save: "Enregistrer",
+  btn_delete: "Supprimer",
+  btn_add: "Ajouter",
+  btn_close: "Fermer",
+  btn_confirm: "Confirmer",
+
+  notif_sale_done: "Vente enregistrée",
+  notif_export_csv: "Export CSV téléchargé",
+  notif_export_pdf: "Impression lancée",
+  notif_product_added: "Produit ajouté au catalogue",
+  notif_product_deleted: "Produit supprimé",
+  notif_price_updated: "Prix mis à jour",
+
+  del_product_title: "Supprimer ce produit ?",
+  del_product_body: "Cette action est irréversible.",
+};
+
+const en: typeof fr = {
+  nav_voitures: "Vehicles",
+  nav_catalogue: "Catalogue",
+  nav_caisse: "Checkout",
+  nav_ventes: "Sales",
+
+  cat_title: "Product catalogue",
+  cat_add: "New product",
+  cat_search_ph: "Search a product...",
+  cat_empty: "No products",
+  cat_empty_sub: "Add your first product.",
+  cat_name_ph: "Product name",
+  cat_price_ph: "Price (€)",
+  cat_edit_price: "Edit price",
+  cat_new_price_ph: "New price",
+
+  caisse_title: "Checkout",
+  caisse_products: "Products",
+  caisse_cart: "Cart",
+  caisse_cart_empty: "Empty cart",
+  caisse_cart_empty_sub: "Select products on the left.",
+  caisse_total: "Total",
+  caisse_validate: "Complete sale",
+  caisse_clear: "Clear",
+  caisse_no_products: "No products in catalogue.",
+  caisse_go_catalogue: "Go to catalogue",
+
+  ventes_title: "Sales history",
+  ventes_empty: "No sales",
+  ventes_empty_sub: "Completed sales will appear here.",
+  ventes_today: "Today",
+  ventes_total_day: "Today's total",
+  ventes_export_csv: "Export CSV",
+  ventes_export_pdf: "Print PDF",
+  ventes_ticket: "Receipt",
+  ventes_articles: "item(s)",
+  ventes_detail_title: "Sale detail",
+  ventes_filter_all: "All",
+  ventes_filter_today: "Today",
+
+  settings_title: "Settings",
+  settings_theme: "Appearance",
+  settings_theme_dark: "Dark",
+  settings_theme_light: "Light",
+  settings_lang: "Language",
+  settings_lang_fr: "Français",
+  settings_lang_en: "English",
+
+  btn_cancel: "Cancel",
+  btn_save: "Save",
+  btn_delete: "Delete",
+  btn_add: "Add",
+  btn_close: "Close",
+  btn_confirm: "Confirm",
+
+  notif_sale_done: "Sale recorded",
+  notif_export_csv: "CSV export downloaded",
+  notif_export_pdf: "Print launched",
+  notif_product_added: "Product added to catalogue",
+  notif_product_deleted: "Product deleted",
+  notif_price_updated: "Price updated",
+
+  del_product_title: "Delete this product?",
+  del_product_body: "This action cannot be undone.",
+};
+
+export const translations = { fr, en };
+export type TKey = keyof typeof fr;
+
+export const t = (lang: Lang, key: TKey): string => translations[lang][key];

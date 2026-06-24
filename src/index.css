@@ -25,6 +25,36 @@
   --red-dim: rgba(239, 68, 68, 0.1);
 }
 
+/* Light theme */
+html.light {
+  --bg: #f1f1f5;
+  --surface: #ffffff;
+  --surface-2: #f7f7fb;
+  --surface-3: #ebebf2;
+  --border: #dcdce8;
+  --border-2: #c8c8d8;
+  --text: #14141f;
+  --text-2: #505068;
+  --text-3: #9090a8;
+  --accent: #d97706;
+  --accent-dim: rgba(217, 119, 6, 0.1);
+  --blue: #2563eb;
+  --blue-dim: rgba(37, 99, 235, 0.1);
+  --green: #16a34a;
+  --green-dim: rgba(22, 163, 74, 0.1);
+  --orange: #ea580c;
+  --orange-dim: rgba(234, 88, 12, 0.1);
+  --gray: #4b5563;
+  --gray-dim: rgba(75, 85, 99, 0.1);
+  --red: #dc2626;
+  --red-dim: rgba(220, 38, 38, 0.08);
+}
+
+@keyframes toastIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;

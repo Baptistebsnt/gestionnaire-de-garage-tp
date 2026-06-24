@@ -1,9 +1,7 @@
-import { app, BrowserWindow } from 'electron'
-import { createRequire } from 'node:module'
+import { app, BrowserWindow, ipcMain, Notification } from 'electron'
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
 
-const require = createRequire(import.meta.url)
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 // The built directory structure
@@ -62,6 +60,12 @@ app.on('activate', () => {
   // dock icon is clicked and there are no other windows open.
   if (BrowserWindow.getAllWindows().length === 0) {
     createWindow()
+  }
+})
+
+ipcMain.on('show-notification', (_, { title, body }: { title: string; body: string }) => {
+  if (Notification.isSupported()) {
+    new Notification({ title, body }).show()
   }
 })
 

@@ -4,8 +4,13 @@ import { useGarage } from "./hooks/useGarage";
 import { Sidebar } from "./components/Sidebar";
 import { InterventionPanel } from "./components/InterventionPanel";
 import { DeleteModal } from "./components/DeleteModal";
+import { TopNav, NavTab } from "./components/TopNav";
+import { SettingsPanel } from "./components/SettingsPanel";
+import { CatalogueView } from "./components/catalogue/CatalogueView";
+import { CaisseView } from "./components/caisse/CaisseView";
+import { VentesView } from "./components/ventes/VentesView";
 
-const App = () => {
+const VoituresLayout = () => {
   const garage = useGarage();
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
@@ -31,14 +36,7 @@ const App = () => {
   };
 
   return (
-    <div
-      style={{
-        display: "flex",
-        height: "100vh",
-        overflow: "hidden",
-        background: "var(--bg)",
-      }}
-    >
+    <div style={{ display: "flex", height: "100%", overflow: "hidden" }}>
       <Sidebar
         voitures={garage.voitures}
         interventions={garage.interventions}
@@ -55,6 +53,7 @@ const App = () => {
           display: "flex",
           flexDirection: "column",
           overflow: "hidden",
+          background: "var(--bg)",
         }}
       >
         {selectedVoiture ? (
@@ -117,6 +116,40 @@ const App = () => {
           onConfirm={() => handleDelete(deleteTarget)}
           onCancel={() => setDeleteTarget(null)}
         />
+      )}
+    </div>
+  );
+};
+
+const App = () => {
+  const [tab, setTab] = useState<NavTab>("voitures");
+  const [showSettings, setShowSettings] = useState(false);
+
+  return (
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        height: "100vh",
+        overflow: "hidden",
+        background: "var(--bg)",
+      }}
+    >
+      <TopNav
+        active={tab}
+        onChange={setTab}
+        onSettings={() => setShowSettings(true)}
+      />
+
+      <div style={{ flex: 1, overflow: "hidden" }}>
+        {tab === "voitures" && <VoituresLayout />}
+        {tab === "catalogue" && <CatalogueView />}
+        {tab === "caisse" && <CaisseView onNavigate={setTab} />}
+        {tab === "ventes" && <VentesView />}
+      </div>
+
+      {showSettings && (
+        <SettingsPanel onClose={() => setShowSettings(false)} />
       )}
     </div>
   );

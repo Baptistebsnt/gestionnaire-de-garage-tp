@@ -31,110 +31,49 @@ export const Sidebar = ({
   };
 
   return (
-    <div
-      style={{
-        width: 380,
-        minWidth: 320,
-        display: "flex",
-        flexDirection: "column",
-        background: "var(--surface)",
-        borderRight: "1px solid var(--border)",
-        overflow: "hidden",
-      }}
-    >
+    <aside className="flex w-[340px] shrink-0 flex-col overflow-hidden border-r border-border bg-surface">
       {/* Header */}
-      <div
-        style={{
-          padding: "16px 16px 14px",
-          borderBottom: "1px solid var(--border)",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          flexShrink: 0,
-        }}
-      >
-        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <div
-            style={{
-              width: 32,
-              height: 32,
-              background: "var(--accent)",
-              borderRadius: 7,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              color: "#0c0c12",
-              flexShrink: 0,
-            }}
-          >
-            <Car size={16} />
+      <div className="flex shrink-0 items-center justify-between border-b border-border px-4 py-3">
+        <div className="flex items-center gap-2.5">
+          <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-accent/10 ring-1 ring-accent-border">
+            <Car size={15} className="text-accent" strokeWidth={2} />
           </div>
           <div>
-            <div
-              style={{
-                fontFamily: "'Barlow Condensed', sans-serif",
-                fontSize: 17,
-                fontWeight: 700,
-                letterSpacing: "0.03em",
-                color: "var(--text)",
-                lineHeight: 1.2,
-              }}
-            >
+            <p className="font-display text-[15px] font-bold leading-tight tracking-[0.04em] text-fg">
               GARAGE MANAGER
-            </div>
-            <div
-              style={{
-                fontSize: 11,
-                color: "var(--text-3)",
-                letterSpacing: "0.04em",
-              }}
-            >
+            </p>
+            <p className="text-[11px] text-fg-3">
               {voitures.length} véhicule{voitures.length !== 1 ? "s" : ""}
-            </div>
+            </p>
           </div>
         </div>
+
         <button
-          className="btn btn-primary"
+          className="btn btn-primary btn-sm"
           onClick={() => setShowForm((f) => !f)}
         >
-          {showForm ? (
-            <>
-              <X size={13} /> Annuler
-            </>
-          ) : (
-            <>
-              <Plus size={13} /> Ajouter
-            </>
-          )}
+          {showForm ? <><X size={12} /> Annuler</> : <><Plus size={12} /> Ajouter</>}
         </button>
       </div>
 
       {/* Add form */}
       {showForm && <CarForm onSubmit={handleAdd} />}
 
-      {/* Car list */}
-      <div style={{ flex: 1, overflowY: "auto", padding: "12px" }}>
+      {/* Vehicle list */}
+      <div className="flex-1 overflow-y-auto p-3">
         {voitures.length === 0 ? (
           <div className="empty">
-            <div className="empty-icon">🚗</div>
-            <div
-              style={{ fontSize: 13, fontWeight: 500, color: "var(--text-2)" }}
-            >
-              Aucun véhicule
-            </div>
-            <div style={{ fontSize: 12 }}>
-              Cliquez sur « Ajouter » pour commencer.
-            </div>
+            <div className="mb-1 text-4xl opacity-30">🚗</div>
+            <p className="text-[13px] font-medium text-fg-2">Aucun véhicule</p>
+            <p className="text-xs text-fg-3">Cliquez sur « Ajouter » pour commencer.</p>
           </div>
         ) : (
-          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+          <div className="flex flex-col gap-2">
             {voitures.map((v) => (
               <CarCard
                 key={v.id}
                 voiture={v}
-                interventionCount={
-                  interventions.filter((i) => i.voitureId === v.id).length
-                }
+                interventionCount={interventions.filter((i) => i.voitureId === v.id).length}
                 selected={selectedId === v.id}
                 onSelect={() => onSelect(v.id)}
                 onAdvance={() => onAdvance(v.id)}
@@ -144,6 +83,6 @@ export const Sidebar = ({
           </div>
         )}
       </div>
-    </div>
+    </aside>
   );
 };

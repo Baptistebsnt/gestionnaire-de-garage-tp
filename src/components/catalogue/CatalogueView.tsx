@@ -9,7 +9,7 @@ import { useToast } from "../Toast";
 const fmt = (prix: number) =>
   prix.toLocaleString("fr-FR", { style: "currency", currency: "EUR" });
 
-type EditState = { id: string; value: string } | null;
+type EditState   = { id: string; value: string } | null;
 type DeleteState = string | null;
 
 export const CatalogueView = () => {
@@ -17,12 +17,12 @@ export const CatalogueView = () => {
   const { toast } = useToast();
   const { produits, addProduit, updateProduit, deleteProduit } = useProduits();
 
-  const [search, setSearch] = useState("");
-  const [showForm, setShowForm] = useState(false);
-  const [nom, setNom] = useState("");
-  const [prix, setPrix] = useState("");
-  const [formError, setFormError] = useState("");
-  const [editPrice, setEditPrice] = useState<EditState>(null);
+  const [search, setSearch]           = useState("");
+  const [showForm, setShowForm]       = useState(false);
+  const [nom, setNom]                 = useState("");
+  const [prix, setPrix]               = useState("");
+  const [formError, setFormError]     = useState("");
+  const [editPrice, setEditPrice]     = useState<EditState>(null);
   const [deleteTarget, setDeleteTarget] = useState<DeleteState>(null);
 
   const filtered = produits.filter((p) =>
@@ -33,8 +33,8 @@ export const CatalogueView = () => {
     e.preventDefault();
     const nomTrim = nom.trim();
     const p = parseFloat(prix.replace(",", "."));
-    if (!nomTrim) { setFormError("Le nom est obligatoire."); return; }
-    if (isNaN(p) || p < 0) { setFormError("Prix invalide."); return; }
+    if (!nomTrim)          { setFormError("Le nom est obligatoire."); return; }
+    if (isNaN(p) || p < 0) { setFormError("Prix invalide.");          return; }
     addProduit({ nom: nomTrim, prix: p });
     setNom("");
     setPrix("");
@@ -62,39 +62,15 @@ export const CatalogueView = () => {
   const targetProduit = produits.find((p) => p.id === deleteTarget);
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", height: "100%", background: "var(--bg)" }}>
+    <div className="flex h-full flex-col overflow-hidden bg-bg">
+
       {/* Header */}
-      <div
-        style={{
-          padding: "16px 24px 14px",
-          borderBottom: "1px solid var(--border)",
-          background: "var(--surface)",
-          display: "flex",
-          alignItems: "center",
-          gap: 12,
-          flexShrink: 0,
-        }}
-      >
-        <div
-          style={{
-            fontFamily: "'Barlow Condensed', sans-serif",
-            fontSize: 18,
-            fontWeight: 700,
-            letterSpacing: "0.04em",
-            color: "var(--text)",
-            flex: 1,
-          }}
-        >
-          {t("cat_title")}
-          <span
-            style={{
-              marginLeft: 10,
-              fontSize: 12,
-              fontFamily: "'DM Sans', sans-serif",
-              fontWeight: 400,
-              color: "var(--text-3)",
-            }}
-          >
+      <div className="flex shrink-0 items-center gap-3 border-b border-border bg-surface px-6 pb-3.5 pt-4">
+        <div className="flex-1">
+          <span className="font-display text-lg font-bold tracking-[0.04em] text-fg">
+            {t("cat_title")}
+          </span>
+          <span className="ml-2.5 font-sans text-xs font-normal text-fg-3">
             {produits.length} produit{produits.length !== 1 ? "s" : ""}
           </span>
         </div>
@@ -102,52 +78,35 @@ export const CatalogueView = () => {
           className="btn btn-primary"
           onClick={() => { setShowForm((f) => !f); setFormError(""); }}
         >
-          {showForm ? <><X size={13} /> {t("btn_cancel")}</> : <><Plus size={13} /> {t("cat_add")}</>}
+          {showForm
+            ? <><X size={13} /> {t("btn_cancel")}</>
+            : <><Plus size={13} /> {t("cat_add")}</>}
         </button>
       </div>
 
       {/* Quick-add form */}
       {showForm && (
-        <div
-          style={{
-            padding: "14px 24px",
-            background: "var(--surface)",
-            borderBottom: "1px solid var(--border)",
-          }}
-        >
-          <form
-            onSubmit={handleAdd}
-            style={{ display: "flex", gap: 8, alignItems: "flex-start" }}
-          >
+        <div className="shrink-0 border-b border-border bg-surface px-6 py-3.5">
+          <form onSubmit={handleAdd} className="flex items-start gap-2">
             <input
-              className="field"
+              className="field flex-[2]"
               placeholder={t("cat_name_ph")}
               value={nom}
               onChange={(e) => setNom(e.target.value)}
               autoFocus
-              style={{ flex: 2 }}
             />
-            <div style={{ position: "relative", flex: 1, maxWidth: 160 }}>
+            <div className="relative max-w-40 flex-1">
               <Euro
                 size={13}
-                style={{
-                  position: "absolute",
-                  left: 9,
-                  top: "50%",
-                  transform: "translateY(-50%)",
-                  color: "var(--text-3)",
-                  pointerEvents: "none",
-                }}
+                className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-fg-3"
               />
               <input
-                className="field"
+                className="field pl-7"
                 type="text"
                 inputMode="decimal"
                 placeholder={t("cat_price_ph")}
                 value={prix}
                 onChange={(e) => setPrix(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && handleAdd(e as unknown as React.FormEvent)}
-                style={{ paddingLeft: 28 }}
               />
             </div>
             <button type="submit" className="btn btn-primary">
@@ -155,62 +114,37 @@ export const CatalogueView = () => {
             </button>
           </form>
           {formError && (
-            <div style={{ fontSize: 12, color: "var(--red)", marginTop: 6 }}>
-              {formError}
-            </div>
+            <p className="mt-1.5 text-xs text-danger">{formError}</p>
           )}
         </div>
       )}
 
       {/* Search */}
-      <div
-        style={{
-          padding: "12px 24px",
-          background: "var(--surface)",
-          borderBottom: "1px solid var(--border)",
-          flexShrink: 0,
-        }}
-      >
-        <div style={{ position: "relative", maxWidth: 360 }}>
+      <div className="shrink-0 border-b border-border bg-surface px-6 py-3">
+        <div className="relative max-w-[360px]">
           <Search
             size={14}
-            style={{
-              position: "absolute",
-              left: 10,
-              top: "50%",
-              transform: "translateY(-50%)",
-              color: "var(--text-3)",
-              pointerEvents: "none",
-            }}
+            className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-fg-3"
           />
           <input
-            className="field"
+            className="field pl-8"
             placeholder={t("cat_search_ph")}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            style={{ paddingLeft: 32 }}
           />
         </div>
       </div>
 
       {/* Product grid */}
-      <div style={{ flex: 1, overflowY: "auto", padding: "20px 24px" }}>
+      <div className="flex-1 overflow-y-auto px-6 py-5">
         {filtered.length === 0 ? (
-          <div className="empty" style={{ marginTop: 60 }}>
-            <Package size={36} style={{ opacity: 0.25, marginBottom: 8 }} />
-            <div style={{ fontSize: 14, fontWeight: 500, color: "var(--text-2)" }}>
-              {t("cat_empty")}
-            </div>
-            <div style={{ fontSize: 13 }}>{t("cat_empty_sub")}</div>
+          <div className="empty mt-16">
+            <Package size={36} className="mb-2 opacity-25" />
+            <p className="text-sm font-medium text-fg-2">{t("cat_empty")}</p>
+            <p className="text-[13px]">{t("cat_empty_sub")}</p>
           </div>
         ) : (
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))",
-              gap: 12,
-            }}
-          >
+          <div className="grid gap-3 grid-cols-[repeat(auto-fill,minmax(220px,1fr))]">
             {filtered.map((p) => (
               <ProduitCard
                 key={p.id}
@@ -233,51 +167,28 @@ export const CatalogueView = () => {
       {/* Delete confirm modal */}
       {deleteTarget && targetProduit && (
         <div
-          style={{
-            position: "fixed",
-            inset: 0,
-            background: "rgba(0,0,0,0.5)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            zIndex: 500,
-          }}
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
           onClick={() => setDeleteTarget(null)}
         >
           <div
-            style={{
-              background: "var(--surface)",
-              border: "1px solid var(--border-2)",
-              borderRadius: 10,
-              padding: "20px 24px",
-              width: 320,
-              boxShadow: "0 12px 40px rgba(0,0,0,0.4)",
-            }}
+            className="w-[320px] rounded-[10px] border border-border-2 bg-surface px-6 py-5 shadow-[0_12px_40px_rgba(0,0,0,0.4)]"
             onClick={(e) => e.stopPropagation()}
           >
-            <div
-              style={{ fontSize: 15, fontWeight: 600, color: "var(--text)", marginBottom: 6 }}
-            >
+            <p className="mb-1.5 text-[15px] font-semibold text-fg">
               {t("del_product_title")}
-            </div>
-            <div style={{ fontSize: 13, color: "var(--text-2)", marginBottom: 4 }}>
-              <strong style={{ color: "var(--text)" }}>{targetProduit.nom}</strong>
+            </p>
+            <p className="mb-1 text-[13px] text-fg-2">
+              <strong className="text-fg">{targetProduit.nom}</strong>
               {" — "}
               {fmt(targetProduit.prix)}
-            </div>
-            <div style={{ fontSize: 12, color: "var(--text-3)", marginBottom: 20 }}>
-              {t("del_product_body")}
-            </div>
-            <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
-              <button
-                className="btn btn-ghost"
-                onClick={() => setDeleteTarget(null)}
-              >
+            </p>
+            <p className="mb-5 text-xs text-fg-3">{t("del_product_body")}</p>
+            <div className="flex justify-end gap-2">
+              <button className="btn btn-ghost" onClick={() => setDeleteTarget(null)}>
                 {t("btn_cancel")}
               </button>
               <button
-                className="btn btn-danger"
-                style={{ background: "var(--red-dim)", border: "1px solid var(--red)" }}
+                className="btn border border-danger bg-danger-dim text-danger hover:bg-danger hover:text-white"
                 onClick={() => handleDelete(deleteTarget)}
               >
                 <Trash2 size={13} /> {t("btn_delete")}
@@ -289,6 +200,8 @@ export const CatalogueView = () => {
     </div>
   );
 };
+
+/* ── Product card sub-component ── */
 
 type ProduitCardProps = {
   produit: Produit;
@@ -314,142 +227,59 @@ const ProduitCard = ({
   const isEditing = editPrice?.id === produit.id;
 
   return (
-    <div
-      style={{
-        background: "var(--surface-2)",
-        border: "1px solid var(--border)",
-        borderRadius: 10,
-        padding: "14px 16px",
-        display: "flex",
-        flexDirection: "column",
-        gap: 10,
-        transition: "border-color 0.15s",
-      }}
-    >
-      <div style={{ display: "flex", alignItems: "flex-start", gap: 8 }}>
-        <div
-          style={{
-            width: 32,
-            height: 32,
-            background: "var(--surface-3)",
-            borderRadius: 8,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            flexShrink: 0,
-          }}
-        >
-          <Package size={15} style={{ color: "var(--text-3)" }} />
+    <div className="flex flex-col gap-2.5 rounded-[10px] border border-border bg-surface-2 px-4 py-3.5 transition-colors duration-150 hover:border-border-2">
+      <div className="flex items-start gap-2">
+        <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-surface-3">
+          <Package size={15} className="text-fg-3" />
         </div>
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <div
-            style={{
-              fontSize: 13,
-              fontWeight: 600,
-              color: "var(--text)",
-              lineHeight: 1.3,
-              wordBreak: "break-word",
-            }}
-          >
-            {produit.nom}
-          </div>
-        </div>
-        <button
-          className="btn btn-danger"
-          style={{ padding: "3px 6px", flexShrink: 0 }}
-          onClick={onDelete}
-        >
+        <p className="min-w-0 flex-1 break-words text-[13px] font-semibold leading-[1.3] text-fg">
+          {produit.nom}
+        </p>
+        <button className="btn btn-danger btn-sm shrink-0" onClick={onDelete}>
           <Trash2 size={12} />
         </button>
       </div>
 
-      {/* Price */}
+      {/* Price — display or edit */}
       {isEditing ? (
-        <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
-          <div style={{ position: "relative", flex: 1 }}>
+        <div className="flex items-center gap-1.5">
+          <div className="relative flex-1">
             <Euro
               size={12}
-              style={{
-                position: "absolute",
-                left: 8,
-                top: "50%",
-                transform: "translateY(-50%)",
-                color: "var(--text-3)",
-                pointerEvents: "none",
-              }}
+              className="pointer-events-none absolute left-2 top-1/2 -translate-y-1/2 text-fg-3"
             />
             <input
-              className="field"
+              className="field h-8 pl-6 text-[13px]"
               type="text"
               inputMode="decimal"
               value={editPrice?.value ?? ""}
               onChange={(e) => onEditPriceChange(e.target.value)}
               autoFocus
               onKeyDown={(e) => {
-                if (e.key === "Enter") onEditPriceConfirm();
+                if (e.key === "Enter")  onEditPriceConfirm();
                 if (e.key === "Escape") onEditPriceCancel();
               }}
-              style={{ paddingLeft: 24, fontSize: 13, height: 32 }}
             />
           </div>
           <button
             onClick={onEditPriceConfirm}
-            style={{
-              width: 32,
-              height: 32,
-              background: "var(--green-dim)",
-              border: "1px solid var(--green)",
-              borderRadius: 6,
-              color: "var(--green)",
-              cursor: "pointer",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              flexShrink: 0,
-            }}
+            className="flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-md border border-success bg-success-dim text-success hover:bg-success hover:text-white transition-colors duration-150"
           >
             <Check size={13} />
           </button>
           <button
             onClick={onEditPriceCancel}
-            style={{
-              width: 32,
-              height: 32,
-              background: "transparent",
-              border: "1px solid var(--border)",
-              borderRadius: 6,
-              color: "var(--text-3)",
-              cursor: "pointer",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              flexShrink: 0,
-            }}
+            className="flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-md border border-border text-fg-3 hover:bg-surface-3 transition-colors duration-150"
           >
             <X size={13} />
           </button>
         </div>
       ) : (
-        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-          <div
-            style={{
-              flex: 1,
-              fontFamily: "'IBM Plex Mono', monospace",
-              fontSize: 16,
-              fontWeight: 600,
-              color: "var(--accent)",
-            }}
-          >
-            {produit.prix.toLocaleString("fr-FR", {
-              style: "currency",
-              currency: "EUR",
-            })}
-          </div>
-          <button
-            className="btn btn-ghost"
-            style={{ padding: "3px 8px", fontSize: 11 }}
-            onClick={() => onEditPrice(produit.id)}
-          >
+        <div className="flex items-center gap-1.5">
+          <span className="flex-1 font-mono text-base font-semibold text-accent">
+            {produit.prix.toLocaleString("fr-FR", { style: "currency", currency: "EUR" })}
+          </span>
+          <button className="btn btn-ghost btn-sm" onClick={() => onEditPrice(produit.id)}>
             <Pencil size={11} /> {t("cat_edit_price")}
           </button>
         </div>

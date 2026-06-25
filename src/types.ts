@@ -8,40 +8,17 @@ export const STATUS_ORDER: CarStatus[] = [
 ];
 
 export const STATUS_LABELS: Record<CarStatus, string> = {
-  recue: "Reçue",
+  recue:         "Reçue",
   en_reparation: "En réparation",
-  prete: "Prête",
-  livree: "Livrée",
+  prete:         "Prête",
+  livree:        "Livrée",
 };
 
-export const STATUS_COLORS: Record<
-  CarStatus,
-  { color: string; borderColor: string; background: string; dot: string }
-> = {
-  recue: {
-    color: "var(--blue)",
-    borderColor: "rgba(59,130,246,0.35)",
-    background: "var(--blue-dim)",
-    dot: "var(--blue)",
-  },
-  en_reparation: {
-    color: "var(--orange)",
-    borderColor: "rgba(249,115,22,0.35)",
-    background: "var(--orange-dim)",
-    dot: "var(--orange)",
-  },
-  prete: {
-    color: "var(--green)",
-    borderColor: "rgba(34,197,94,0.35)",
-    background: "var(--green-dim)",
-    dot: "var(--green)",
-  },
-  livree: {
-    color: "var(--gray)",
-    borderColor: "rgba(107,114,128,0.35)",
-    background: "var(--gray-dim)",
-    dot: "var(--gray)",
-  },
+export const STATUS_CLASSES: Record<CarStatus, { pill: string; dot: string }> = {
+  recue:         { pill: "text-info bg-info-dim border-info-border",           dot: "bg-info" },
+  en_reparation: { pill: "text-warn bg-warn-dim border-warn-border",           dot: "bg-warn" },
+  prete:         { pill: "text-success bg-success-dim border-success-border",  dot: "bg-success" },
+  livree:        { pill: "text-neutral bg-neutral-dim border-neutral-border",  dot: "bg-neutral" },
 };
 
 export type Voiture = {
@@ -83,4 +60,4 @@ export type Vente = {
 };
 
 export type Theme = "dark" | "light";
-export type Lang = "fr" | "en";
+export type Lang  = "fr" | "en";

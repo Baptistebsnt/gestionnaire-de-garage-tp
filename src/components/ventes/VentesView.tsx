@@ -11,6 +11,7 @@ import { Vente } from "../../types";
 import { useVentes } from "../../hooks/useVentes";
 import { useSettings } from "../../context/SettingsContext";
 import { useToast } from "../Toast";
+import { cn } from "../../lib/cn";
 
 const todayStr = () => new Date().toISOString().slice(0, 10);
 
@@ -47,16 +48,16 @@ const exportCSV = (ventes: Vente[], lang: string) => {
 
   const csv = [header, ...rows].join("\n");
   const blob = new Blob(["﻿" + csv], { type: "text/csv;charset=utf-8;" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement("a");
+  a.href     = url;
   a.download = `ventes_${todayStr()}.csv`;
   a.click();
   URL.revokeObjectURL(url);
 };
 
 const printPDF = (ventes: Vente[], lang: string) => {
-  const isEn = lang === "en";
+  const isEn  = lang === "en";
   const title = isEn ? "Sales History" : "Historique des ventes";
 
   const rows = ventes
@@ -130,83 +131,35 @@ const printPDF = (ventes: Vente[], lang: string) => {
 
 export const VentesView = () => {
   const { t, lang } = useSettings();
-  const { toast } = useToast();
+  const { toast }   = useToast();
   const { ventes, ventesOfDay, totalOfDay } = useVentes();
 
-  const [filter, setFilter] = useState<"all" | "today">("today");
+  const [filter, setFilter]   = useState<"all" | "today">("today");
   const [selected, setSelected] = useState<Vente | null>(null);
 
-  const today = todayStr();
-  const displayed = filter === "today" ? ventesOfDay(today) : ventes;
+  const today      = todayStr();
+  const displayed  = filter === "today" ? ventesOfDay(today) : ventes;
   const todayTotal = totalOfDay(today);
 
-  const handleCSV = () => {
-    exportCSV(displayed, lang);
-    toast(t("notif_export_csv"));
-  };
-
-  const handlePDF = () => {
-    printPDF(displayed, lang);
-    toast(t("notif_export_pdf"));
-  };
+  const handleCSV = () => { exportCSV(displayed, lang); toast(t("notif_export_csv")); };
+  const handlePDF = () => { printPDF(displayed, lang);  toast(t("notif_export_pdf")); };
 
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        height: "100%",
-        background: "var(--bg)",
-        overflow: "hidden",
-      }}
-    >
-      {/* Header */}
-      <div
-        style={{
-          padding: "16px 24px 14px",
-          borderBottom: "1px solid var(--border)",
-          background: "var(--surface)",
-          flexShrink: 0,
-          display: "flex",
-          alignItems: "center",
-          gap: 12,
-          flexWrap: "wrap",
-        }}
-      >
-        <div
-          style={{
-            fontFamily: "'Barlow Condensed', sans-serif",
-            fontSize: 18,
-            fontWeight: 700,
-            letterSpacing: "0.04em",
-            color: "var(--text)",
-            flex: 1,
-            minWidth: 180,
-          }}
-        >
-          {t("ventes_title")}
-        </div>
+    <div className="flex h-full flex-col overflow-hidden bg-bg">
 
-        {/* Today total badge */}
+      {/* Header */}
+      <div className="flex shrink-0 flex-wrap items-center gap-3 border-b border-border bg-surface px-6 pb-3.5 pt-4">
+        <span className="min-w-[180px] flex-1 font-display text-lg font-bold tracking-[0.04em] text-fg">
+          {t("ventes_title")}
+        </span>
+
         {todayTotal > 0 && (
-          <div
-            style={{
-              padding: "5px 12px",
-              background: "var(--accent-dim)",
-              border: "1px solid rgba(245,158,11,0.3)",
-              borderRadius: 999,
-              fontSize: 13,
-              fontWeight: 600,
-              color: "var(--accent)",
-              fontFamily: "'IBM Plex Mono', monospace",
-            }}
-          >
+          <span className="rounded-full border border-[rgba(245,158,11,0.3)] bg-accent-dim px-3 py-[5px] font-mono text-[13px] font-semibold text-accent">
             {t("ventes_today")} : {fmtMoney(todayTotal)}
-          </div>
+          </span>
         )}
 
-        {/* Export buttons */}
-        <div style={{ display: "flex", gap: 6 }}>
+        <div className="flex gap-1.5">
           <button
             className="btn btn-ghost"
             onClick={handleCSV}
@@ -225,47 +178,21 @@ export const VentesView = () => {
       </div>
 
       {/* Filter tabs */}
-      <div
-        style={{
-          display: "flex",
-          gap: 6,
-          padding: "10px 24px",
-          background: "var(--surface)",
-          borderBottom: "1px solid var(--border)",
-          flexShrink: 0,
-        }}
-      >
+      <div className="flex shrink-0 gap-1.5 border-b border-border bg-surface px-6 py-2.5">
         {(["today", "all"] as const).map((f) => (
           <button
             key={f}
             onClick={() => setFilter(f)}
-            style={{
-              padding: "4px 12px",
-              background: filter === f ? "var(--surface-3)" : "transparent",
-              border: "1px solid",
-              borderColor: filter === f ? "var(--border-2)" : "transparent",
-              borderRadius: 5,
-              color: filter === f ? "var(--text)" : "var(--text-3)",
-              fontSize: 12,
-              fontWeight: filter === f ? 500 : 400,
-              cursor: "pointer",
-              fontFamily: "'DM Sans', sans-serif",
-              transition: "all 0.12s",
-            }}
+            className={cn(
+              "cursor-pointer rounded-[5px] border px-3 py-1 font-sans text-xs transition-all duration-150",
+              filter === f
+                ? "border-border-2 bg-surface-3 font-medium text-fg"
+                : "border-transparent font-normal text-fg-3 hover:text-fg-2"
+            )}
           >
             {f === "today" ? t("ventes_filter_today") : t("ventes_filter_all")}
             {f === "today" && ventesOfDay(today).length > 0 && (
-              <span
-                style={{
-                  marginLeft: 6,
-                  background: "var(--accent)",
-                  color: "#0c0c12",
-                  borderRadius: 999,
-                  fontSize: 10,
-                  fontWeight: 700,
-                  padding: "1px 5px",
-                }}
-              >
+              <span className="ml-1.5 rounded-full bg-accent px-[5px] py-px text-[10px] font-bold text-[#0c0c12]">
                 {ventesOfDay(today).length}
               </span>
             )}
@@ -274,87 +201,38 @@ export const VentesView = () => {
       </div>
 
       {/* Sales list */}
-      <div style={{ flex: 1, overflowY: "auto", padding: "16px 24px" }}>
+      <div className="flex-1 overflow-y-auto px-6 py-4">
         {displayed.length === 0 ? (
-          <div className="empty" style={{ marginTop: 60 }}>
-            <BarChart2 size={36} style={{ opacity: 0.2, marginBottom: 8 }} />
-            <div style={{ fontSize: 14, fontWeight: 500, color: "var(--text-2)" }}>
-              {t("ventes_empty")}
-            </div>
-            <div style={{ fontSize: 13 }}>{t("ventes_empty_sub")}</div>
+          <div className="empty mt-16">
+            <BarChart2 size={36} className="mb-2 opacity-20" />
+            <p className="text-sm font-medium text-fg-2">{t("ventes_empty")}</p>
+            <p className="text-[13px]">{t("ventes_empty_sub")}</p>
           </div>
         ) : (
-          <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+          <div className="flex flex-col gap-1.5">
             {displayed.map((v, idx) => {
               const lineCount = v.lignes.reduce((s, l) => s + l.quantite, 0);
               return (
                 <button
                   key={v.id}
                   onClick={() => setSelected(v)}
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 14,
-                    padding: "12px 16px",
-                    background: "var(--surface-2)",
-                    border: "1px solid var(--border)",
-                    borderRadius: 8,
-                    cursor: "pointer",
-                    textAlign: "left",
-                    transition: "all 0.12s",
-                    width: "100%",
-                    fontFamily: "'DM Sans', sans-serif",
-                  }}
-                  onMouseEnter={(e) => {
-                    (e.currentTarget as HTMLButtonElement).style.background = "var(--surface-3)";
-                    (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--border-2)";
-                  }}
-                  onMouseLeave={(e) => {
-                    (e.currentTarget as HTMLButtonElement).style.background = "var(--surface-2)";
-                    (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--border)";
-                  }}
+                  className="flex w-full cursor-pointer items-center gap-3.5 rounded-lg border border-border bg-surface-2 px-4 py-3 text-left font-sans transition-all duration-150 hover:border-border-2 hover:bg-surface-3"
                 >
-                  <div
-                    style={{
-                      width: 32,
-                      height: 32,
-                      background: "var(--surface-3)",
-                      borderRadius: 8,
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      flexShrink: 0,
-                      color: "var(--text-3)",
-                    }}
-                  >
+                  <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-surface-3 text-fg-3">
                     <ShoppingBag size={15} />
                   </div>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div
-                      style={{
-                        fontSize: 13,
-                        fontWeight: 500,
-                        color: "var(--text)",
-                        marginBottom: 2,
-                      }}
-                    >
+                  <div className="min-w-0 flex-1">
+                    <p className="mb-0.5 text-[13px] font-medium text-fg">
                       {t("ventes_ticket")} #{String(displayed.length - idx).padStart(3, "0")}
-                    </div>
-                    <div style={{ fontSize: 12, color: "var(--text-3)" }}>
+                    </p>
+                    <p className="text-xs text-fg-3">
                       {fmtTime(v.date, lang)} — {lineCount} {t("ventes_articles")}
-                    </div>
+                    </p>
                   </div>
-                  <div
-                    style={{
-                      fontFamily: "'IBM Plex Mono', monospace",
-                      fontSize: 16,
-                      fontWeight: 700,
-                      color: "var(--text)",
-                    }}
-                  >
+                  <span className="font-mono text-base font-bold text-fg">
                     {fmtMoney(v.total)}
-                  </div>
-                  <ChevronRight size={15} style={{ color: "var(--text-3)", flexShrink: 0 }} />
+                  </span>
+                  <ChevronRight size={15} className="shrink-0 text-fg-3" />
                 </button>
               );
             })}
@@ -362,151 +240,58 @@ export const VentesView = () => {
         )}
       </div>
 
-      {/* Ticket detail modal */}
+      {/* Sale detail modal */}
       {selected && (
         <div
-          style={{
-            position: "fixed",
-            inset: 0,
-            background: "rgba(0,0,0,0.55)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            zIndex: 500,
-          }}
+          className="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(0,0,0,0.55)]"
           onClick={() => setSelected(null)}
         >
           <div
-            style={{
-              background: "var(--surface)",
-              border: "1px solid var(--border-2)",
-              borderRadius: 12,
-              width: 420,
-              maxHeight: "80vh",
-              display: "flex",
-              flexDirection: "column",
-              boxShadow: "0 20px 60px rgba(0,0,0,0.5)",
-              overflow: "hidden",
-            }}
+            className="flex w-[420px] max-h-[80vh] flex-col overflow-hidden rounded-xl border border-border-2 bg-surface shadow-[0_20px_60px_rgba(0,0,0,0.5)]"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modal header */}
-            <div
-              style={{
-                padding: "16px 20px 14px",
-                borderBottom: "1px solid var(--border)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-              }}
-            >
+            <div className="flex shrink-0 items-center justify-between border-b border-border px-5 pb-3.5 pt-4">
               <div>
-                <div
-                  style={{
-                    fontFamily: "'Barlow Condensed', sans-serif",
-                    fontSize: 16,
-                    fontWeight: 700,
-                    letterSpacing: "0.04em",
-                    color: "var(--text)",
-                  }}
-                >
+                <p className="font-display text-base font-bold tracking-[0.04em] text-fg">
                   {t("ventes_detail_title")}
-                </div>
-                <div style={{ fontSize: 12, color: "var(--text-3)", marginTop: 2 }}>
-                  {fmtDate(selected.date, lang)}
-                </div>
+                </p>
+                <p className="mt-0.5 text-xs text-fg-3">{fmtDate(selected.date, lang)}</p>
               </div>
               <button
                 onClick={() => setSelected(null)}
-                style={{
-                  background: "none",
-                  border: "none",
-                  cursor: "pointer",
-                  color: "var(--text-3)",
-                  display: "flex",
-                  padding: 4,
-                }}
+                className="btn-icon p-1 text-fg-3 hover:text-fg"
               >
                 <X size={16} />
               </button>
             </div>
 
-            {/* Lines */}
-            <div style={{ flex: 1, overflowY: "auto", padding: "14px 20px" }}>
-              <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+            {/* Line items */}
+            <div className="flex-1 overflow-y-auto px-5 py-3.5">
+              <div className="flex flex-col gap-1.5">
                 {selected.lignes.map((l, i) => (
                   <div
                     key={i}
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 10,
-                      padding: "8px 12px",
-                      background: "var(--surface-2)",
-                      border: "1px solid var(--border)",
-                      borderRadius: 6,
-                    }}
+                    className="flex items-center gap-2.5 rounded-md border border-border bg-surface-2 px-3 py-2"
                   >
-                    <div style={{ flex: 1, fontSize: 13, color: "var(--text)" }}>
-                      {l.nom}
-                    </div>
-                    <div
-                      style={{
-                        fontSize: 12,
-                        color: "var(--text-3)",
-                        fontFamily: "'IBM Plex Mono', monospace",
-                      }}
-                    >
+                    <p className="flex-1 text-[13px] text-fg">{l.nom}</p>
+                    <span className="font-mono text-xs text-fg-3">
                       {fmtMoney(l.prix)} × {l.quantite}
-                    </div>
-                    <div
-                      style={{
-                        fontSize: 13,
-                        fontWeight: 600,
-                        color: "var(--text)",
-                        fontFamily: "'IBM Plex Mono', monospace",
-                        minWidth: 60,
-                        textAlign: "right",
-                      }}
-                    >
+                    </span>
+                    <span className="min-w-[60px] text-right font-mono text-[13px] font-semibold text-fg">
                       {fmtMoney(l.prix * l.quantite)}
-                    </div>
+                    </span>
                   </div>
                 ))}
               </div>
             </div>
 
-            {/* Total */}
-            <div
-              style={{
-                padding: "14px 20px",
-                borderTop: "1px solid var(--border)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                background: "var(--accent-dim)",
-              }}
-            >
-              <span
-                style={{
-                  fontFamily: "'Barlow Condensed', sans-serif",
-                  fontSize: 14,
-                  fontWeight: 700,
-                  letterSpacing: "0.06em",
-                  textTransform: "uppercase",
-                  color: "var(--accent)",
-                }}
-              >
+            {/* Total footer */}
+            <div className="flex shrink-0 items-center justify-between border-t border-border bg-accent-dim px-5 py-3.5">
+              <span className="font-display text-sm font-bold uppercase tracking-[0.06em] text-accent">
                 {t("caisse_total")}
               </span>
-              <span
-                style={{
-                  fontFamily: "'IBM Plex Mono', monospace",
-                  fontSize: 22,
-                  fontWeight: 700,
-                  color: "var(--accent)",
-                }}
-              >
+              <span className="font-mono text-[22px] font-bold text-accent">
                 {fmtMoney(selected.total)}
               </span>
             </div>

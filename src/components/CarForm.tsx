@@ -8,24 +8,17 @@ interface Props {
 
 export const CarForm = ({ onSubmit }: Props) => {
   const [immatriculation, setImmatriculation] = useState("");
-  const [marque, setMarque] = useState("");
-  const [modele, setModele] = useState("");
+  const [marque, setMarque]     = useState("");
+  const [modele, setModele]     = useState("");
   const [nomClient, setNomClient] = useState("");
-  const [error, setError] = useState("");
+  const [error, setError]       = useState("");
   const immatRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => {
-    immatRef.current?.focus();
-  }, []);
+  useEffect(() => { immatRef.current?.focus(); }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (
-      !immatriculation.trim() ||
-      !marque.trim() ||
-      !modele.trim() ||
-      !nomClient.trim()
-    ) {
+    if (!immatriculation.trim() || !marque.trim() || !modele.trim() || !nomClient.trim()) {
       setError("Tous les champs sont obligatoires.");
       return;
     }
@@ -35,51 +28,26 @@ export const CarForm = ({ onSubmit }: Props) => {
       modele: modele.trim(),
       nomClient: nomClient.trim(),
     });
-    setImmatriculation("");
-    setMarque("");
-    setModele("");
-    setNomClient("");
-    setError("");
+    setImmatriculation(""); setMarque(""); setModele(""); setNomClient(""); setError("");
   };
 
   return (
     <form
       onSubmit={handleSubmit}
-      style={{
-        padding: "14px 16px",
-        borderBottom: "1px solid var(--border)",
-        background: "var(--surface-2)",
-        display: "flex",
-        flexDirection: "column",
-        gap: 8,
-      }}
+      className="flex shrink-0 flex-col gap-2 border-b border-border bg-surface-2 px-4 py-3"
     >
       <div className="section-label">Nouveau véhicule</div>
+
       <input
         ref={immatRef}
-        className="field"
+        className="field font-mono uppercase tracking-wider"
         placeholder="Immatriculation (ex: AB-123-CD)"
         value={immatriculation}
         onChange={(e) => setImmatriculation(e.target.value)}
-        style={{
-          fontFamily: "'IBM Plex Mono', monospace",
-          letterSpacing: "0.05em",
-          textTransform: "uppercase",
-        }}
       />
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
-        <input
-          className="field"
-          placeholder="Marque"
-          value={marque}
-          onChange={(e) => setMarque(e.target.value)}
-        />
-        <input
-          className="field"
-          placeholder="Modèle"
-          value={modele}
-          onChange={(e) => setModele(e.target.value)}
-        />
+      <div className="grid grid-cols-2 gap-2">
+        <input className="field" placeholder="Marque" value={marque} onChange={(e) => setMarque(e.target.value)} />
+        <input className="field" placeholder="Modèle" value={modele} onChange={(e) => setModele(e.target.value)} />
       </div>
       <input
         className="field"
@@ -87,14 +55,9 @@ export const CarForm = ({ onSubmit }: Props) => {
         value={nomClient}
         onChange={(e) => setNomClient(e.target.value)}
       />
-      {error && (
-        <div style={{ fontSize: 12, color: "var(--red)" }}>{error}</div>
-      )}
-      <button
-        type="submit"
-        className="btn btn-primary"
-        style={{ width: "100%", justifyContent: "center" }}
-      >
+      {error && <p className="text-[11px] text-danger">{error}</p>}
+
+      <button type="submit" className="btn btn-primary w-full justify-center">
         <Plus size={13} /> Enregistrer le véhicule
       </button>
     </form>

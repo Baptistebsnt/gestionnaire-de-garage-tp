@@ -1,5 +1,6 @@
 import { ArrowRight, Wrench, Trash2 } from "lucide-react";
-import { Voiture, STATUS_LABELS, STATUS_COLORS } from "../types";
+import { Voiture, STATUS_LABELS, STATUS_CLASSES } from "../types";
+import { cn } from "../lib/cn";
 
 type Props = {
   voiture: Voiture;
@@ -18,86 +19,52 @@ export const CarCard = ({
   onAdvance,
   onDelete,
 }: Props) => {
-  const sc = STATUS_COLORS[voiture.statut];
+  const sc = STATUS_CLASSES[voiture.statut];
   const isLast = voiture.statut === "livree";
 
   return (
     <div
-      className={`car-card${selected ? " selected" : ""}`}
+      className={cn("car-card", selected && "selected")}
       onClick={onSelect}
     >
-      <div
-        style={{
-          display: "flex",
-          alignItems: "flex-start",
-          justifyContent: "space-between",
-          gap: 8,
-          marginBottom: 8,
-        }}
-      >
-        <div>
+      {/* Top row: plate + status */}
+      <div className="mb-2.5 flex items-start justify-between gap-2">
+        <div className="min-w-0">
           <span className="plate">{voiture.immatriculation}</span>
-          <div
-            style={{
-              marginTop: 5,
-              fontSize: 13,
-              fontWeight: 500,
-              color: "var(--text)",
-            }}
-          >
+          <p className="mt-1.5 text-[13px] font-semibold leading-tight text-fg">
             {voiture.marque} {voiture.modele}
-          </div>
-          <div style={{ fontSize: 12, color: "var(--text-2)", marginTop: 1 }}>
-            {voiture.nomClient}
-          </div>
+          </p>
+          <p className="mt-0.5 text-[11.5px] text-fg-2">{voiture.nomClient}</p>
         </div>
-        <span className="status-pill" style={sc}>
-          <span
-            style={{
-              width: 5,
-              height: 5,
-              borderRadius: "50%",
-              background: sc.dot,
-              display: "inline-block",
-              flexShrink: 0,
-            }}
-          />
+        <span className={cn("status-pill", sc.pill)}>
+          <span className={cn("size-1.5 shrink-0 rounded-full", sc.dot)} />
           {STATUS_LABELS[voiture.statut]}
         </span>
       </div>
 
-      <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+      {/* Actions row */}
+      <div className="flex items-center gap-1">
         <button
-          className="btn btn-advance"
-          style={{ fontSize: 11, padding: "4px 8px" }}
+          className="btn btn-advance btn-sm"
           disabled={isLast}
-          onClick={(e) => {
-            e.stopPropagation();
-            onAdvance();
-          }}
+          onClick={(e) => { e.stopPropagation(); onAdvance(); }}
         >
-          <ArrowRight size={12} /> Avancer
+          <ArrowRight size={11} /> Avancer
         </button>
+
         <button
-          className="btn btn-ghost"
-          style={{ fontSize: 11, padding: "4px 8px" }}
-          onClick={(e) => {
-            e.stopPropagation();
-            onSelect();
-          }}
+          className="btn btn-ghost btn-sm"
+          onClick={(e) => { e.stopPropagation(); onSelect(); }}
         >
-          <Wrench size={12} />
+          <Wrench size={11} />
           {interventionCount > 0
             ? `${interventionCount} intervention${interventionCount > 1 ? "s" : ""}`
             : "Interventions"}
         </button>
+
         <button
-          className="btn btn-danger"
-          style={{ marginLeft: "auto", padding: "4px 8px" }}
-          onClick={(e) => {
-            e.stopPropagation();
-            onDelete();
-          }}
+          className="btn-icon ml-auto p-1.5 rounded-md text-fg-3 hover:text-danger hover:bg-danger-dim"
+          onClick={(e) => { e.stopPropagation(); onDelete(); }}
         >
           <Trash2 size={13} />
         </button>

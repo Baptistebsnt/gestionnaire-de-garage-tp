@@ -36,7 +36,7 @@ const VoituresLayout = () => {
   };
 
   return (
-    <div style={{ display: "flex", height: "100%", overflow: "hidden" }}>
+    <div className="flex h-full overflow-hidden">
       <Sidebar
         voitures={garage.voitures}
         interventions={garage.interventions}
@@ -47,15 +47,7 @@ const VoituresLayout = () => {
         onDeleteRequest={setDeleteTarget}
       />
 
-      <div
-        style={{
-          flex: 1,
-          display: "flex",
-          flexDirection: "column",
-          overflow: "hidden",
-          background: "var(--bg)",
-        }}
-      >
+      <div className="flex flex-1 flex-col overflow-hidden bg-bg">
         {selectedVoiture ? (
           <InterventionPanel
             voiture={selectedVoiture}
@@ -67,45 +59,16 @@ const VoituresLayout = () => {
             onClose={() => setSelectedId(null)}
           />
         ) : (
-          <div
-            style={{
-              flex: 1,
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              justifyContent: "center",
-              color: "var(--text-3)",
-            }}
-          >
-            <div
-              style={{
-                width: 64,
-                height: 64,
-                borderRadius: 16,
-                background: "var(--surface-2)",
-                border: "1px solid var(--border)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                marginBottom: 16,
-                opacity: 0.6,
-              }}
-            >
+          <div className="flex flex-1 flex-col items-center justify-center text-fg-3">
+            <div className="mb-4 flex size-16 items-center justify-center rounded-2xl border border-border bg-surface-2 opacity-60">
               <Wrench size={28} />
             </div>
-            <div
-              style={{
-                fontSize: 14,
-                fontWeight: 500,
-                color: "var(--text-2)",
-                marginBottom: 6,
-              }}
-            >
+            <p className="mb-1.5 text-[14px] font-medium text-fg-2">
               Sélectionnez un véhicule
-            </div>
-            <div style={{ fontSize: 13 }}>
+            </p>
+            <p className="text-[13px]">
               Cliquez sur une voiture pour gérer ses interventions.
-            </div>
+            </p>
           </div>
         )}
       </div>
@@ -126,31 +89,21 @@ const App = () => {
   const [showSettings, setShowSettings] = useState(false);
 
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        height: "100vh",
-        overflow: "hidden",
-        background: "var(--bg)",
-      }}
-    >
+    <div className="flex h-screen flex-col overflow-hidden bg-bg">
       <TopNav
         active={tab}
         onChange={setTab}
         onSettings={() => setShowSettings(true)}
       />
 
-      <div style={{ flex: 1, overflow: "hidden" }}>
+      <div className="flex-1 overflow-hidden">
         {tab === "voitures" && <VoituresLayout />}
         {tab === "catalogue" && <CatalogueView />}
         {tab === "caisse" && <CaisseView onNavigate={setTab} />}
         {tab === "ventes" && <VentesView />}
       </div>
 
-      {showSettings && (
-        <SettingsPanel onClose={() => setShowSettings(false)} />
-      )}
+      {showSettings && <SettingsPanel onClose={() => setShowSettings(false)} />}
     </div>
   );
 };

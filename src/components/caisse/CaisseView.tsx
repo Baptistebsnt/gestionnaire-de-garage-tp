@@ -13,6 +13,7 @@ import { useProduits } from "../../hooks/useProduits";
 import { useVentes } from "../../hooks/useVentes";
 import { useSettings } from "../../context/SettingsContext";
 import { useToast } from "../Toast";
+import { cn } from "../../lib/cn";
 
 type NavTab = "voitures" | "catalogue" | "caisse" | "ventes";
 
@@ -22,7 +23,7 @@ type Props = {
 
 export const CaisseView = ({ onNavigate }: Props) => {
   const { t, lang } = useSettings();
-  const { toast } = useToast();
+  const { toast }   = useToast();
   const { produits } = useProduits();
   const { addVente } = useVentes();
 
@@ -44,19 +45,14 @@ export const CaisseView = ({ onNavigate }: Props) => {
           l.produitId === id ? { ...l, quantite: l.quantite + 1 } : l,
         );
       }
-      return [
-        ...prev,
-        { produitId: id, nom: prod.nom, prix: prod.prix, quantite: 1 },
-      ];
+      return [...prev, { produitId: id, nom: prod.nom, prix: prod.prix, quantite: 1 }];
     });
   };
 
   const changeQty = (id: string, delta: number) => {
     setPanier((prev) =>
       prev
-        .map((l) =>
-          l.produitId === id ? { ...l, quantite: l.quantite + delta } : l,
-        )
+        .map((l) => l.produitId === id ? { ...l, quantite: l.quantite + delta } : l)
         .filter((l) => l.quantite > 0),
     );
   };
@@ -84,143 +80,65 @@ export const CaisseView = ({ onNavigate }: Props) => {
   };
 
   return (
-    <div
-      style={{
-        display: "flex",
-        height: "100%",
-        background: "var(--bg)",
-        overflow: "hidden",
-      }}
-    >
-      {/* Products panel */}
-      <div
-        style={{
-          flex: 1,
-          display: "flex",
-          flexDirection: "column",
-          borderRight: "1px solid var(--border)",
-          overflow: "hidden",
-        }}
-      >
-        <div
-          style={{
-            padding: "14px 20px 12px",
-            background: "var(--surface)",
-            borderBottom: "1px solid var(--border)",
-            flexShrink: 0,
-          }}
-        >
-          <div
-            style={{
-              fontFamily: "'Barlow Condensed', sans-serif",
-              fontSize: 13,
-              fontWeight: 700,
-              letterSpacing: "0.1em",
-              textTransform: "uppercase",
-              color: "var(--text-3)",
-              marginBottom: 10,
-            }}
-          >
+    <div className="flex h-full overflow-hidden bg-bg">
+
+      {/* ── Products panel ── */}
+      <div className="flex flex-1 flex-col overflow-hidden border-r border-border">
+
+        {/* Products header */}
+        <div className="shrink-0 border-b border-border bg-surface px-5 pb-3 pt-3.5">
+          <p className="mb-2.5 font-display text-[13px] font-bold uppercase tracking-[0.1em] text-fg-3">
             {t("caisse_products")}
-          </div>
-          <div style={{ position: "relative" }}>
+          </p>
+          <div className="relative">
             <Search
               size={14}
-              style={{
-                position: "absolute",
-                left: 10,
-                top: "50%",
-                transform: "translateY(-50%)",
-                color: "var(--text-3)",
-                pointerEvents: "none",
-              }}
+              className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-fg-3"
             />
             <input
-              className="field"
+              className="field pl-8"
               placeholder={t("cat_search_ph")}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              style={{ paddingLeft: 32 }}
             />
           </div>
         </div>
 
-        <div style={{ flex: 1, overflowY: "auto", padding: "14px 20px" }}>
+        {/* Products grid */}
+        <div className="flex-1 overflow-y-auto px-5 py-3.5">
           {produits.length === 0 ? (
-            <div className="empty" style={{ marginTop: 40 }}>
-              <Package size={32} style={{ opacity: 0.25, marginBottom: 8 }} />
-              <div style={{ fontSize: 13, color: "var(--text-2)", marginBottom: 8 }}>
-                {t("caisse_no_products")}
-              </div>
-              <button
-                className="btn btn-ghost"
-                onClick={() => onNavigate("catalogue")}
-              >
+            <div className="empty mt-10">
+              <Package size={32} className="mb-2 opacity-25" />
+              <p className="text-[13px] text-fg-2">{t("caisse_no_products")}</p>
+              <button className="btn btn-ghost mt-1" onClick={() => onNavigate("catalogue")}>
                 {t("caisse_go_catalogue")}
               </button>
             </div>
           ) : (
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))",
-                gap: 8,
-              }}
-            >
+            <div className="grid gap-2 grid-cols-[repeat(auto-fill,minmax(160px,1fr))]">
               {produitsFiltres.map((p) => {
                 const inCart = panier.find((l) => l.produitId === p.id);
                 return (
                   <button
                     key={p.id}
                     onClick={() => addToCart(p.id)}
-                    style={{
-                      background: inCart
-                        ? "var(--accent-dim)"
-                        : "var(--surface-2)",
-                      border: "1px solid",
-                      borderColor: inCart ? "var(--accent)" : "var(--border)",
-                      borderRadius: 10,
-                      padding: "12px 14px",
-                      cursor: "pointer",
-                      textAlign: "left",
-                      transition: "all 0.12s",
-                      display: "flex",
-                      flexDirection: "column",
-                      gap: 6,
-                    }}
+                    className={cn(
+                      "flex cursor-pointer flex-col gap-1.5 rounded-[10px] border px-3.5 py-3 text-left transition-all duration-150",
+                      inCart
+                        ? "border-accent bg-accent-dim"
+                        : "border-border bg-surface-2 hover:border-border-2 hover:bg-surface-3"
+                    )}
                   >
-                    <div
-                      style={{
-                        fontSize: 12,
-                        fontWeight: 600,
-                        color: inCart ? "var(--accent)" : "var(--text)",
-                        lineHeight: 1.3,
-                      }}
-                    >
+                    <p className={cn("text-xs font-semibold leading-[1.3]", inCart ? "text-accent" : "text-fg")}>
                       {p.nom}
-                    </div>
-                    <div
-                      style={{
-                        fontFamily: "'IBM Plex Mono', monospace",
-                        fontSize: 14,
-                        fontWeight: 600,
-                        color: inCart ? "var(--accent)" : "var(--text-2)",
-                      }}
-                    >
+                    </p>
+                    <p className={cn("font-mono text-sm font-semibold", inCart ? "text-accent" : "text-fg-2")}>
                       {fmt(p.prix)}
-                    </div>
+                    </p>
                     {inCart && (
-                      <div
-                        style={{
-                          fontSize: 10,
-                          color: "var(--accent)",
-                          fontWeight: 600,
-                          letterSpacing: "0.06em",
-                          textTransform: "uppercase",
-                        }}
-                      >
+                      <p className="text-[10px] font-semibold uppercase tracking-[0.06em] text-accent">
                         × {inCart.quantite}
-                      </div>
+                      </p>
                     )}
                   </button>
                 );
@@ -230,62 +148,23 @@ export const CaisseView = ({ onNavigate }: Props) => {
         </div>
       </div>
 
-      {/* Cart panel */}
-      <div
-        style={{
-          width: 340,
-          display: "flex",
-          flexDirection: "column",
-          background: "var(--surface)",
-          overflow: "hidden",
-          flexShrink: 0,
-        }}
-      >
-        <div
-          style={{
-            padding: "14px 20px 12px",
-            borderBottom: "1px solid var(--border)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            flexShrink: 0,
-          }}
-        >
-          <div
-            style={{
-              fontFamily: "'Barlow Condensed', sans-serif",
-              fontSize: 13,
-              fontWeight: 700,
-              letterSpacing: "0.1em",
-              textTransform: "uppercase",
-              color: "var(--text-3)",
-              display: "flex",
-              alignItems: "center",
-              gap: 6,
-            }}
-          >
+      {/* ── Cart panel ── */}
+      <div className="flex w-[340px] shrink-0 flex-col overflow-hidden bg-surface">
+
+        {/* Cart header */}
+        <div className="flex shrink-0 items-center justify-between border-b border-border px-5 pb-3 pt-3.5">
+          <div className="flex items-center gap-1.5 font-display text-[13px] font-bold uppercase tracking-[0.1em] text-fg-3">
             <ShoppingCart size={14} />
             {t("caisse_cart")}
             {panier.length > 0 && (
-              <span
-                style={{
-                  background: "var(--accent)",
-                  color: "#0c0c12",
-                  borderRadius: 999,
-                  fontSize: 10,
-                  fontWeight: 700,
-                  padding: "1px 6px",
-                  fontFamily: "'DM Sans', sans-serif",
-                }}
-              >
+              <span className="rounded-full bg-accent px-1.5 py-px font-sans text-[10px] font-bold text-[#0c0c12]">
                 {panier.reduce((s, l) => s + l.quantite, 0)}
               </span>
             )}
           </div>
           {panier.length > 0 && (
             <button
-              className="btn btn-ghost"
-              style={{ fontSize: 11, padding: "3px 8px" }}
+              className="btn btn-ghost btn-sm"
               onClick={() => setPanier([])}
             >
               {t("caisse_clear")}
@@ -294,118 +173,49 @@ export const CaisseView = ({ onNavigate }: Props) => {
         </div>
 
         {/* Cart lines */}
-        <div style={{ flex: 1, overflowY: "auto", padding: "12px 16px" }}>
+        <div className="flex-1 overflow-y-auto px-4 py-3">
           {panier.length === 0 ? (
-            <div className="empty" style={{ marginTop: 48 }}>
-              <ShoppingCart size={28} style={{ opacity: 0.2, marginBottom: 8 }} />
-              <div style={{ fontSize: 13, color: "var(--text-2)" }}>
-                {t("caisse_cart_empty")}
-              </div>
-              <div style={{ fontSize: 12 }}>{t("caisse_cart_empty_sub")}</div>
+            <div className="empty mt-12">
+              <ShoppingCart size={28} className="mb-2 opacity-20" />
+              <p className="text-[13px] text-fg-2">{t("caisse_cart_empty")}</p>
+              <p className="text-xs">{t("caisse_cart_empty_sub")}</p>
             </div>
           ) : (
-            <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+            <div className="flex flex-col gap-1.5">
               {panier.map((l) => (
                 <div
                   key={l.produitId}
-                  style={{
-                    background: "var(--surface-2)",
-                    border: "1px solid var(--border)",
-                    borderRadius: 8,
-                    padding: "10px 12px",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 8,
-                  }}
+                  className="flex items-center gap-2 rounded-lg border border-border bg-surface-2 px-3 py-2.5"
                 >
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div
-                      style={{
-                        fontSize: 12,
-                        fontWeight: 500,
-                        color: "var(--text)",
-                        lineHeight: 1.3,
-                        wordBreak: "break-word",
-                      }}
-                    >
+                  <div className="min-w-0 flex-1">
+                    <p className="break-words text-xs font-medium leading-[1.3] text-fg">
                       {l.nom}
-                    </div>
-                    <div
-                      style={{
-                        fontFamily: "'IBM Plex Mono', monospace",
-                        fontSize: 12,
-                        color: "var(--text-2)",
-                        marginTop: 2,
-                      }}
-                    >
+                    </p>
+                    <p className="mt-0.5 font-mono text-xs text-fg-2">
                       {fmt(l.prix)} × {l.quantite} ={" "}
-                      <strong style={{ color: "var(--text)" }}>
-                        {fmt(l.prix * l.quantite)}
-                      </strong>
-                    </div>
+                      <strong className="text-fg">{fmt(l.prix * l.quantite)}</strong>
+                    </p>
                   </div>
-                  <div
-                    style={{ display: "flex", alignItems: "center", gap: 4 }}
-                  >
+
+                  <div className="flex items-center gap-1">
                     <button
                       onClick={() => changeQty(l.produitId, -1)}
-                      style={{
-                        width: 24,
-                        height: 24,
-                        background: "var(--surface-3)",
-                        border: "1px solid var(--border)",
-                        borderRadius: 4,
-                        color: "var(--text-2)",
-                        cursor: "pointer",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                      }}
+                      className="btn-icon size-6 rounded border border-border bg-surface-3 text-fg-2 hover:text-fg"
                     >
                       <Minus size={11} />
                     </button>
-                    <span
-                      style={{
-                        fontSize: 13,
-                        fontWeight: 600,
-                        color: "var(--text)",
-                        minWidth: 20,
-                        textAlign: "center",
-                      }}
-                    >
+                    <span className="min-w-5 text-center text-[13px] font-semibold text-fg">
                       {l.quantite}
                     </span>
                     <button
                       onClick={() => changeQty(l.produitId, 1)}
-                      style={{
-                        width: 24,
-                        height: 24,
-                        background: "var(--surface-3)",
-                        border: "1px solid var(--border)",
-                        borderRadius: 4,
-                        color: "var(--text-2)",
-                        cursor: "pointer",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                      }}
+                      className="btn-icon size-6 rounded border border-border bg-surface-3 text-fg-2 hover:text-fg"
                     >
                       <Plus size={11} />
                     </button>
                     <button
                       onClick={() => removeLine(l.produitId)}
-                      style={{
-                        width: 24,
-                        height: 24,
-                        background: "transparent",
-                        border: "none",
-                        color: "var(--text-3)",
-                        cursor: "pointer",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        marginLeft: 2,
-                      }}
+                      className="btn-icon ml-0.5 size-6 text-fg-3 hover:text-danger"
                     >
                       <Trash2 size={12} />
                     </button>
@@ -416,75 +226,27 @@ export const CaisseView = ({ onNavigate }: Props) => {
           )}
         </div>
 
-        {/* Footer */}
-        <div
-          style={{
-            padding: "14px 16px",
-            borderTop: "1px solid var(--border)",
-            flexShrink: 0,
-          }}
-        >
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              marginBottom: 12,
-              padding: "10px 14px",
-              background: "var(--accent-dim)",
-              border: "1px solid rgba(245,158,11,0.25)",
-              borderRadius: 8,
-            }}
-          >
-            <span
-              style={{
-                fontFamily: "'Barlow Condensed', sans-serif",
-                fontSize: 13,
-                fontWeight: 700,
-                letterSpacing: "0.08em",
-                textTransform: "uppercase",
-                color: "var(--accent)",
-              }}
-            >
+        {/* Cart footer */}
+        <div className="shrink-0 border-t border-border px-4 py-3.5">
+          <div className="mb-3 flex items-center justify-between rounded-lg border border-[rgba(245,158,11,0.25)] bg-accent-dim px-3.5 py-2.5">
+            <span className="font-display text-[13px] font-bold uppercase tracking-[0.08em] text-accent">
               {t("caisse_total")}
             </span>
-            <span
-              style={{
-                fontFamily: "'IBM Plex Mono', monospace",
-                fontSize: 22,
-                fontWeight: 700,
-                color: "var(--accent)",
-              }}
-            >
+            <span className="font-mono text-[22px] font-bold text-accent">
               {fmt(total)}
             </span>
           </div>
 
           <button
-            className="btn btn-primary"
-            style={{
-              width: "100%",
-              justifyContent: "center",
-              padding: "10px",
-              fontSize: 14,
-              fontWeight: 600,
-              gap: 8,
-              background: success ? "var(--green)" : undefined,
-              borderColor: success ? "var(--green)" : undefined,
-              transition: "all 0.2s",
-            }}
+            className={cn(
+              "btn btn-primary w-full justify-center py-2.5 text-sm font-semibold gap-2 transition-all duration-200",
+              success && "bg-success border-success"
+            )}
             disabled={panier.length === 0}
             onClick={handleValidate}
           >
-            {success ? (
-              <>
-                <CheckCircle size={15} /> {t("notif_sale_done")}
-              </>
-            ) : (
-              <>
-                <CheckCircle size={15} /> {t("caisse_validate")}
-              </>
-            )}
+            <CheckCircle size={15} />
+            {success ? t("notif_sale_done") : t("caisse_validate")}
           </button>
         </div>
       </div>

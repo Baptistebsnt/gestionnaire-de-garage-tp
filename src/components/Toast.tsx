@@ -8,8 +8,7 @@ import {
 import { CheckCircle, X } from "lucide-react";
 
 type ToastItem = { id: string; message: string };
-
-type ToastCtx = { toast: (message: string) => void };
+type ToastCtx  = { toast: (message: string) => void };
 
 const ToastContext = createContext<ToastCtx>({ toast: () => {} });
 export const useToast = () => useContext(ToastContext);
@@ -21,7 +20,7 @@ const sendSystemNotification = (message: string) => {
       body: message,
     });
   } catch {
-    // not in electron
+    // not in Electron
   }
 };
 
@@ -44,51 +43,19 @@ export const ToastProvider = ({ children }: { children: ReactNode }) => {
   return (
     <ToastContext.Provider value={{ toast }}>
       {children}
-      <div
-        style={{
-          position: "fixed",
-          bottom: 24,
-          right: 24,
-          display: "flex",
-          flexDirection: "column",
-          gap: 8,
-          zIndex: 9999,
-          pointerEvents: "none",
-        }}
-      >
+
+      {/* Toast stack */}
+      <div className="pointer-events-none fixed bottom-6 right-6 z-[9999] flex flex-col gap-2">
         {toasts.map((t) => (
           <div
             key={t.id}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 10,
-              padding: "10px 14px",
-              background: "var(--surface-3)",
-              border: "1px solid var(--border-2)",
-              borderRadius: 8,
-              boxShadow: "0 4px 20px rgba(0,0,0,0.35)",
-              minWidth: 240,
-              maxWidth: 340,
-              animation: "toastIn 0.2s ease",
-              pointerEvents: "all",
-            }}
+            className="toast-enter pointer-events-auto flex min-w-60 max-w-[340px] items-center gap-2.5 rounded-lg border border-border-2 bg-surface-3 px-3.5 py-2.5 shadow-[0_4px_20px_rgba(0,0,0,0.35)]"
           >
-            <CheckCircle size={15} style={{ color: "var(--green)", flexShrink: 0 }} />
-            <span style={{ fontSize: 13, color: "var(--text)", flex: 1 }}>
-              {t.message}
-            </span>
+            <CheckCircle size={15} className="shrink-0 text-success" />
+            <span className="flex-1 text-[13px] text-fg">{t.message}</span>
             <button
               onClick={() => dismiss(t.id)}
-              style={{
-                background: "none",
-                border: "none",
-                cursor: "pointer",
-                color: "var(--text-3)",
-                padding: 0,
-                display: "flex",
-                flexShrink: 0,
-              }}
+              className="btn-icon shrink-0 text-fg-3 hover:text-fg"
             >
               <X size={13} />
             </button>

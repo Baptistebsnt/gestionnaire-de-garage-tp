@@ -1,5 +1,6 @@
 import { Car, Package, ShoppingCart, BarChart2, Settings } from "lucide-react";
 import { useSettings } from "../context/SettingsContext";
+import { cn } from "../lib/cn";
 
 export type NavTab = "voitures" | "catalogue" | "caisse" | "ventes";
 
@@ -13,133 +14,50 @@ export const TopNav = ({ active, onChange, onSettings }: Props) => {
   const { t } = useSettings();
 
   const tabs: { id: NavTab; icon: typeof Car; key: Parameters<typeof t>[0] }[] = [
-    { id: "voitures", icon: Car, key: "nav_voitures" },
-    { id: "catalogue", icon: Package, key: "nav_catalogue" },
-    { id: "caisse", icon: ShoppingCart, key: "nav_caisse" },
-    { id: "ventes", icon: BarChart2, key: "nav_ventes" },
+    { id: "voitures",  icon: Car,          key: "nav_voitures" },
+    { id: "catalogue", icon: Package,      key: "nav_catalogue" },
+    { id: "caisse",    icon: ShoppingCart, key: "nav_caisse" },
+    { id: "ventes",    icon: BarChart2,    key: "nav_ventes" },
   ];
 
   return (
-    <div
-      style={{
-        height: 48,
-        background: "var(--surface)",
-        borderBottom: "1px solid var(--border)",
-        display: "flex",
-        alignItems: "center",
-        padding: "0 16px",
-        gap: 4,
-        flexShrink: 0,
-      }}
-    >
-      {/* Logo */}
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: 8,
-          marginRight: 16,
-        }}
-      >
-        <div
-          style={{
-            width: 26,
-            height: 26,
-            background: "var(--accent)",
-            borderRadius: 6,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            color: "#0c0c12",
-            flexShrink: 0,
-          }}
-        >
-          <Car size={14} />
+    <header className="flex h-12 shrink-0 items-center gap-1 border-b border-border bg-surface px-4">
+      {/* Brand */}
+      <div className="mr-4 flex items-center gap-2 shrink-0">
+        <div className="flex size-7 items-center justify-center rounded-[7px] bg-accent shadow-[0_2px_8px_rgba(245,158,11,0.4)]">
+          <Car size={13} strokeWidth={2.5} className="text-[#0b0b10]" />
         </div>
-        <span
-          style={{
-            fontFamily: "'Barlow Condensed', sans-serif",
-            fontSize: 14,
-            fontWeight: 700,
-            letterSpacing: "0.05em",
-            color: "var(--text)",
-          }}
-        >
+        <span className="font-display text-[13px] font-bold tracking-[0.08em] text-fg">
           GARAGE
         </span>
       </div>
 
       {/* Tabs */}
-      <div
-        style={{
-          display: "flex",
-          gap: 2,
-          flex: 1,
-        }}
-      >
-        {tabs.map(({ id, icon: Icon, key }) => {
-          const isActive = active === id;
-          return (
-            <button
-              key={id}
-              onClick={() => onChange(id)}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 6,
-                padding: "5px 12px",
-                background: isActive ? "var(--surface-3)" : "transparent",
-                border: "1px solid",
-                borderColor: isActive ? "var(--border-2)" : "transparent",
-                borderRadius: 6,
-                color: isActive ? "var(--text)" : "var(--text-3)",
-                fontSize: 13,
-                fontFamily: "'DM Sans', sans-serif",
-                fontWeight: isActive ? 500 : 400,
-                cursor: "pointer",
-                transition: "all 0.12s",
-              }}
-            >
-              <Icon size={14} />
-              {t(key)}
-            </button>
-          );
-        })}
-      </div>
+      <nav className="flex flex-1 gap-0.5">
+        {tabs.map(({ id, icon: Icon, key }) => (
+          <button
+            key={id}
+            onClick={() => onChange(id)}
+            className={cn(
+              "flex cursor-pointer items-center gap-1.5 rounded-md border px-3 py-1.5 font-sans text-[12.5px] transition-all duration-150",
+              active === id
+                ? "border-border-2 bg-surface-3 font-semibold text-fg"
+                : "border-transparent font-normal text-fg-3 hover:bg-surface-2 hover:text-fg-2"
+            )}
+          >
+            <Icon size={13} strokeWidth={active === id ? 2.5 : 1.75} />
+            {t(key)}
+          </button>
+        ))}
+      </nav>
 
       {/* Settings */}
       <button
         onClick={onSettings}
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          width: 32,
-          height: 32,
-          background: "transparent",
-          border: "1px solid transparent",
-          borderRadius: 6,
-          color: "var(--text-3)",
-          cursor: "pointer",
-          transition: "all 0.12s",
-        }}
-        onMouseEnter={(e) => {
-          (e.currentTarget as HTMLButtonElement).style.background =
-            "var(--surface-3)";
-          (e.currentTarget as HTMLButtonElement).style.borderColor =
-            "var(--border)";
-          (e.currentTarget as HTMLButtonElement).style.color = "var(--text)";
-        }}
-        onMouseLeave={(e) => {
-          (e.currentTarget as HTMLButtonElement).style.background =
-            "transparent";
-          (e.currentTarget as HTMLButtonElement).style.borderColor =
-            "transparent";
-          (e.currentTarget as HTMLButtonElement).style.color = "var(--text-3)";
-        }}
+        className="btn-icon size-8 rounded-md text-fg-3 hover:bg-surface-2 hover:text-fg"
       >
-        <Settings size={15} />
+        <Settings size={14} />
       </button>
-    </div>
+    </header>
   );
 };

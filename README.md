@@ -1,6 +1,6 @@
-# Garage Manager
+# Caisse Manager
 
-Application desktop de gestion de garage automobile — construite avec **Electron**, **React 18** et **TypeScript**. Fonctionne entièrement **hors-ligne**, sans backend ni base de données serveur.
+Application desktop de logiciel de caisse — construite avec **Electron**, **React 18** et **TypeScript**. Fonctionne entièrement **hors-ligne**, sans backend ni base de données serveur.
 
 ---
 
@@ -19,12 +19,12 @@ Application desktop de gestion de garage automobile — construite avec **Electr
 
 ## Aperçu
 
-Garage Manager couvre l'ensemble du flux d'un atelier automobile :
+Caisse Manager couvre l'ensemble du flux d'une caisse enregistreuse :
 
 ```
-Réception du véhicule → Suivi des réparations → Impression de la facture
-       ↓
-Vente de pièces en caisse → Historique des ventes → Tableau de bord
+Catalogue produits → Caisse (panier) → Validation de vente
+                                              ↓
+                              Historique des ventes → Tableau de bord
 ```
 
 Toutes les données sont persistées localement via `localStorage` et peuvent être sauvegardées / restaurées en un clic.
@@ -33,23 +33,9 @@ Toutes les données sont persistées localement via `localStorage` et peuvent ê
 
 ## Fonctionnalités
 
-### Gestion des véhicules
-
-- Enregistrement d'un véhicule (immatriculation, marque, modèle, client)
-- Progression de statut en un clic : **Reçue → En réparation → Prête → Livrée**
-- Sélection d'un véhicule pour afficher le panneau d'interventions
-- Suppression avec confirmation et cascade sur les interventions liées
-
-### Interventions
-
-- Ajout d'interventions (description + prix) sur chaque véhicule
-- Calcul automatique du total à payer
-- Suppression individuelle d'une intervention
-- **Impression de facture PDF** en un clic — mise en page propre avec en-tête, tableau des prestations et total TTC
-
 ### Catalogue produits
 
-- Gestion d'un catalogue de pièces et consommables
+- Gestion d'un catalogue de produits
 - Ajout manuel ou **enrichissement automatique via l'API OpenFoodFacts** :
   - Recherche par nom avec suggestions en temps réel (debounce 420 ms)
   - Lookup direct par code-barre EAN
@@ -73,17 +59,15 @@ Toutes les données sont persistées localement via `localStorage` et peuvent ê
 
 ### Tableau de bord
 
-- **4 KPI** : CA total, CA du mois, véhicules actifs, ventes du jour
-- **Répartition des statuts** avec barres de progression proportionnelles
+- **4 KPI** : CA total, CA du mois, ventes du jour, produits vendus
 - **Graphe CA des 7 derniers jours** (barres CSS, aujourd'hui mis en avant)
 - **Top 5 produits** par chiffre d'affaires
-- **Moyennes** : interventions par véhicule, prix moyen d'intervention, véhicules livrés
 
 ### Paramètres
 
 - **Thème sombre / clair** — basculement instantané via variables CSS
 - **Langue** — Français / English (i18n maison, type-safe)
-- **Export des données** — backup JSON complet (voitures, interventions, produits, ventes)
+- **Export des données** — backup JSON complet (produits, ventes)
 - **Import des données** — restauration depuis un fichier backup avec confirmation
 
 ---
@@ -147,7 +131,7 @@ Génère un installateur natif dans `release/<version>/` :
 | `npm run dev` | Lance l'app en mode développement (HMR) |
 | `npm run build` | Build TypeScript + Vite + electron-builder |
 | `npm run lint` | ESLint sur tous les fichiers TS/TSX |
-| `npm test` | Lance la suite de tests (54 tests) |
+| `npm test` | Lance la suite de tests |
 | `npm run test:watch` | Tests en mode watch (rechargement automatique) |
 | `npm run test:coverage` | Tests avec rapport de couverture HTML |
 
@@ -159,17 +143,12 @@ Génère un installateur natif dans `release/<version>/` :
 src/
 ├── App.tsx                         # Routage par onglet, layout principal
 ├── main.tsx                        # Point d'entrée React, providers globaux
-├── types.ts                        # Types TypeScript + STATUS_CLASSES
+├── types.ts                        # Types TypeScript (Produit, Vente, LigneVente)
 ├── i18n.ts                         # Traductions fr/en, type-safe (TKey)
 ├── index.css                       # Design tokens, @theme inline, @layer base/components
 │
 ├── components/
 │   ├── TopNav.tsx                  # Navigation + onglets
-│   ├── Sidebar.tsx                 # Liste des véhicules
-│   ├── CarCard.tsx                 # Carte véhicule avec statut
-│   ├── CarForm.tsx                 # Formulaire ajout véhicule
-│   ├── InterventionPanel.tsx       # Détail + interventions + impression facture
-│   ├── DeleteModal.tsx             # Confirmation de suppression
 │   ├── SettingsPanel.tsx           # Thème, langue, backup/restore
 │   ├── Toast.tsx                   # Notifications UI (Context + Provider)
 │   ├── caisse/CaisseView.tsx       # Interface de caisse
@@ -181,7 +160,6 @@ src/
 │   └── SettingsContext.tsx         # lang, theme, t() — disponible globalement
 │
 ├── hooks/
-│   ├── useGarage.ts                # CRUD voitures + interventions + localStorage
 │   ├── useProduits.ts              # CRUD produits + localStorage
 │   └── useVentes.ts                # Ventes + filtres + localStorage
 │
@@ -189,12 +167,11 @@ src/
 │   └── openFoodFacts.ts            # searchOFF() + lookupOFF()
 │
 ├── lib/
-│   ├── cn.ts                       # Classname merger utility
-│   └── printFacture.ts             # Génération de facture PDF
+│   └── cn.ts                       # Classname merger utility
 │
 └── __tests__/
     ├── unit/                       # cn, i18n, openFoodFacts
-    └── integration/                # useGarage, useProduits, CatalogueView
+    └── integration/                # useProduits, CatalogueView
 ```
 
 ### Flux de données
@@ -207,7 +184,7 @@ Hooks custom  ←→  localStorage
 Services externes (OpenFoodFacts API)
 ```
 
-Les hooks (`useGarage`, `useProduits`, `useVentes`) encapsulent l'état et la persistance. Les composants consomment les hooks via props ou directement. Aucun gestionnaire d'état global (Redux, Zustand) — les domaines sont assez indépendants pour que les hooks suffisent.
+Les hooks (`useProduits`, `useVentes`) encapsulent l'état et la persistance. Les composants consomment les hooks via props ou directement. Aucun gestionnaire d'état global (Redux, Zustand) — les domaines sont assez indépendants pour que les hooks suffisent.
 
 ### Thème dark/light
 
@@ -225,8 +202,6 @@ Le renderer n'a pas accès à Node.js (`nodeIntegration: false`, `contextIsolati
 
 | Clé localStorage | Contenu |
 |---|---|
-| `garage_voitures` | Tableau de `Voiture[]` |
-| `garage_interventions` | Tableau de `Intervention[]` |
 | `garage_produits` | Tableau de `Produit[]` |
 | `garage_ventes` | Tableau de `Vente[]` (snapshot dénormalisé) |
 
@@ -236,19 +211,16 @@ Les lignes de vente (`LigneVente`) copient le nom et le prix du produit au momen
 
 ## Tests
 
-**54 tests** couvrant les couches unitaire et intégration.
-
 ```bash
 npm test
 ```
 
 ```
-✓ unit/cn.test.ts                (7 tests)  — Classname merger utility
-✓ unit/i18n.test.ts              (5 tests)  — Cohérence fr/en, fonction t()
-✓ unit/openFoodFacts.test.ts    (10 tests)  — searchOFF + lookupOFF (fetch mocké)
-✓ integration/useGarage.test.ts (10 tests)  — CRUD voitures, statuts, cascade delete
-✓ integration/useProduits.test.ts (8 tests) — CRUD produits, enrichissement OFF
-✓ integration/CatalogueView.test.tsx (14)   — Rendu, formulaire, recherche, suppression
+✓ unit/cn.test.ts                 — Classname merger utility
+✓ unit/i18n.test.ts               — Cohérence fr/en, fonction t()
+✓ unit/openFoodFacts.test.ts      — searchOFF + lookupOFF (fetch mocké)
+✓ integration/useProduits.test.ts — CRUD produits, enrichissement OFF
+✓ integration/CatalogueView.test.tsx — Rendu, formulaire, recherche, suppression
 ```
 
 **Rapport de couverture :**

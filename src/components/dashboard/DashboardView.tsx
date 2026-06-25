@@ -1,7 +1,5 @@
-import { BarChart2, Car, ShoppingBag, TrendingUp, Package } from "lucide-react";
-import { useGarage } from "../../hooks/useGarage";
+import { BarChart2, ShoppingBag, TrendingUp, Package } from "lucide-react";
 import { useVentes } from "../../hooks/useVentes";
-import { STATUS_LABELS, STATUS_ORDER, STATUS_CLASSES } from "../../types";
 import { useSettings } from "../../context/SettingsContext";
 import { cn } from "../../lib/cn";
 
@@ -46,7 +44,6 @@ const KpiCard = ({ label, value, sub, icon: Icon, accent }: KpiProps) => (
 /* ── Main view ── */
 export const DashboardView = () => {
   const { t } = useSettings();
-  const { voitures, interventions } = useGarage();
   const { ventes, ventesOfDay } = useVentes();
 
   const today = new Date().toISOString().slice(0, 10);
@@ -55,11 +52,10 @@ export const DashboardView = () => {
   /* KPIs */
   const caTotal    = ventes.reduce((s, v) => s + v.total, 0);
   const caMonth    = ventes.filter(v => v.date.slice(0, 7) === currentMonth).reduce((s, v) => s + v.total, 0);
-  const actifs     = voitures.filter(v => v.statut !== "livree").length;
   const ventesJour = ventesOfDay(today).length;
-
-  /* Répartition des statuts */
-  const maxStatutCount = Math.max(...STATUS_ORDER.map(s => voitures.filter(v => v.statut === s).length), 1);
+  const nbProduits = Object.keys(
+    ventes.flatMap(v => v.lignes).reduce((a, l) => ({ ...a, [l.produitId]: true }), {})
+  ).length;
 
   /* CA 7 derniers jours */
   const last7 = Array.from({ length: 7 }, (_, i) => {
@@ -85,14 +81,6 @@ export const DashboardView = () => {
       }, {} as Record<string, { nom: string; quantite: number; revenue: number }>)
   ).sort((a, b) => b.revenue - a.revenue).slice(0, 5);
 
-  /* Moyennes */
-  const avgInterv = voitures.length
-    ? (interventions.length / voitures.length).toFixed(1)
-    : "—";
-  const avgPrice = interventions.length
-    ? fmtMoney(interventions.reduce((s, i) => s + i.prix, 0) / interventions.length)
-    : "—";
-
   return (
     <div className="h-full overflow-y-auto bg-bg px-6 py-5">
       <div className="mx-auto max-w-[960px] space-y-6">
@@ -109,50 +97,14 @@ export const DashboardView = () => {
 
         {/* KPIs */}
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-          <KpiCard label={t("dash_ca_total")}         value={fmtMoney(caTotal)}    icon={TrendingUp}   accent />
-          <KpiCard label={t("dash_ca_month")}         value={fmtMoney(caMonth)}    icon={BarChart2}    sub={currentMonth} />
-          <KpiCard label={t("dash_active_vehicles")}  value={String(actifs)}       icon={Car}          sub={`/ ${voitures.length} total`} />
-          <KpiCard label={t("dash_sales_today")}      value={String(ventesJour)}   icon={ShoppingBag}  sub={t("ventes_filter_today")} />
+          <KpiCard label={t("dash_ca_total")}      value={fmtMoney(caTotal)}  icon={TrendingUp}  accent />
+          <KpiCard label={t("dash_ca_month")}      value={fmtMoney(caMonth)}  icon={BarChart2}   sub={currentMonth} />
+          <KpiCard label={t("dash_sales_today")}   value={String(ventesJour)} icon={ShoppingBag} sub={t("ventes_filter_today")} />
+          <KpiCard label={t("dash_products_sold")} value={String(nbProduits)} icon={Package}     sub={t("dash_distinct_products")} />
         </div>
 
         {/* Middle row */}
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-
-          {/* Statuts */}
-          <div className="rounded-xl border border-border bg-surface-2 p-4">
-            <h2 className="mb-4 text-[11px] font-semibold uppercase tracking-widest text-fg-3">
-              {t("dash_status_dist")}
-            </h2>
-            {voitures.length === 0 ? (
-              <p className="text-[12px] text-fg-3">{t("dash_no_vehicles")}</p>
-            ) : (
-              <div className="space-y-3">
-                {STATUS_ORDER.map(statut => {
-                  const count = voitures.filter(v => v.statut === statut).length;
-                  const pct   = Math.round((count / Math.max(voitures.length, 1)) * 100);
-                  const barPct = Math.round((count / maxStatutCount) * 100);
-                  const sc    = STATUS_CLASSES[statut];
-                  return (
-                    <div key={statut}>
-                      <div className="mb-1 flex items-center justify-between text-[12px]">
-                        <span className={cn("status-pill text-[11px]", sc.pill)}>
-                          <span className={cn("size-1.5 shrink-0 rounded-full", sc.dot)} />
-                          {STATUS_LABELS[statut]}
-                        </span>
-                        <span className="font-mono text-[12px] text-fg-2">{count} <span className="text-fg-3">({pct}%)</span></span>
-                      </div>
-                      <div className="h-1.5 w-full overflow-hidden rounded-full bg-surface-3">
-                        <div
-                          className="h-full rounded-full bg-fg-3 transition-all duration-500"
-                          style={{ width: `${barPct}%` }}
-                        />
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </div>
 
           {/* CA 7 jours */}
           <div className="rounded-xl border border-border bg-surface-2 p-4">
@@ -193,10 +145,6 @@ export const DashboardView = () => {
               </div>
             )}
           </div>
-        </div>
-
-        {/* Bottom row */}
-        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
 
           {/* Top produits */}
           <div className="rounded-xl border border-border bg-surface-2 p-4">
@@ -224,37 +172,6 @@ export const DashboardView = () => {
                 ))}
               </div>
             )}
-          </div>
-
-          {/* Moyennes */}
-          <div className="rounded-xl border border-border bg-surface-2 p-4">
-            <h2 className="mb-4 text-[11px] font-semibold uppercase tracking-widest text-fg-3">
-              Moyennes
-            </h2>
-            <div className="space-y-3">
-              <div className="flex items-center justify-between rounded-lg border border-border bg-surface-3 px-4 py-3">
-                <span className="text-[12px] text-fg-2">{t("dash_avg_interventions")}</span>
-                <span className="font-mono text-[18px] font-bold text-fg">{avgInterv}</span>
-              </div>
-              <div className="flex items-center justify-between rounded-lg border border-border bg-surface-3 px-4 py-3">
-                <span className="text-[12px] text-fg-2">{t("dash_avg_price")}</span>
-                <span className="font-mono text-[18px] font-bold text-fg">{avgPrice}</span>
-              </div>
-              <div className="flex items-center justify-between rounded-lg border border-border bg-surface-3 px-4 py-3">
-                <span className="text-[12px] text-fg-2">Véhicules traités</span>
-                <span className="font-mono text-[18px] font-bold text-fg">
-                  {voitures.filter(v => v.statut === "livree").length}
-                </span>
-              </div>
-              <div className="flex items-center justify-between rounded-lg border border-border bg-surface-3 px-4 py-3">
-                <span className="text-[12px] text-fg-2">Produits en catalogue</span>
-                <span className="font-mono text-[18px] font-bold text-fg">
-                  {Object.keys(
-                    ventes.flatMap(v => v.lignes).reduce((a, l) => ({ ...a, [l.produitId]: true }), {})
-                  ).length || "—"}
-                </span>
-              </div>
-            </div>
           </div>
         </div>
 

@@ -20,19 +20,19 @@ describe("translations", () => {
 
 describe("t()", () => {
   it("returns the french translation", () => {
-    expect(t("fr", "nav_voitures")).toBe("Véhicules");
+    expect(t("fr", "nav_caisse")).toBe("Caisse");
     expect(t("fr", "btn_cancel")).toBe("Annuler");
     expect(t("fr", "caisse_total")).toBe("Total");
   });
 
   it("returns the english translation", () => {
-    expect(t("en", "nav_voitures")).toBe("Vehicles");
+    expect(t("en", "nav_caisse")).toBe("Checkout");
     expect(t("en", "btn_cancel")).toBe("Cancel");
     expect(t("en", "caisse_total")).toBe("Total");
   });
 
   it("returns different values for fr and en", () => {
-    expect(t("fr", "nav_voitures")).not.toBe(t("en", "nav_voitures"));
+    expect(t("fr", "nav_caisse")).not.toBe(t("en", "nav_caisse"));
     expect(t("fr", "btn_delete")).not.toBe(t("en", "btn_delete"));
   });
 });

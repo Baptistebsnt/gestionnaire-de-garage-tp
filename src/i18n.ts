@@ -1,7 +1,6 @@
 import { Lang } from "./types";
 
 const fr = {
-  nav_voitures: "Véhicules",
   nav_catalogue: "Catalogue",
   nav_caisse: "Caisse",
   nav_ventes: "Ventes",
@@ -81,16 +80,13 @@ const fr = {
 
   dash_ca_total: "CA total",
   dash_ca_month: "Ce mois",
-  dash_active_vehicles: "Véhicules actifs",
   dash_sales_today: "Ventes aujourd'hui",
-  dash_status_dist: "Répartition des statuts",
+  dash_products_sold: "Produits vendus",
+  dash_distinct_products: "références distinctes",
   dash_revenue_7days: "CA — 7 derniers jours",
   dash_top_products: "Top produits",
   dash_no_data: "Aucune donnée",
-  dash_avg_interventions: "Interventions / véhicule",
-  dash_avg_price: "Prix moyen / intervention",
   dash_no_sales: "Aucune vente enregistrée.",
-  dash_no_vehicles: "Aucun véhicule enregistré.",
 
   backup_section: "Données",
   backup_export: "Exporter les données",
@@ -104,7 +100,6 @@ const fr = {
 };
 
 const en: typeof fr = {
-  nav_voitures: "Vehicles",
   nav_catalogue: "Catalogue",
   nav_caisse: "Checkout",
   nav_ventes: "Sales",
@@ -184,16 +179,13 @@ const en: typeof fr = {
 
   dash_ca_total: "Total revenue",
   dash_ca_month: "This month",
-  dash_active_vehicles: "Active vehicles",
   dash_sales_today: "Sales today",
-  dash_status_dist: "Status distribution",
+  dash_products_sold: "Products sold",
+  dash_distinct_products: "distinct references",
   dash_revenue_7days: "Revenue — last 7 days",
   dash_top_products: "Top products",
   dash_no_data: "No data",
-  dash_avg_interventions: "Interventions / vehicle",
-  dash_avg_price: "Avg price / intervention",
   dash_no_sales: "No sales recorded.",
-  dash_no_vehicles: "No vehicles registered.",
 
   backup_section: "Data",
   backup_export: "Export data",

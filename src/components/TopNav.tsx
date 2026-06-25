@@ -1,8 +1,8 @@
-import { Car, Package, ShoppingCart, BarChart2, LayoutDashboard, Settings } from "lucide-react";
+import { ShoppingCart, Package, BarChart2, LayoutDashboard, Settings } from "lucide-react";
 import { useSettings } from "../context/SettingsContext";
 import { cn } from "../lib/cn";
 
-export type NavTab = "voitures" | "catalogue" | "caisse" | "ventes" | "dashboard";
+export type NavTab = "catalogue" | "caisse" | "ventes" | "dashboard";
 
 type Props = {
   active: NavTab;
@@ -13,12 +13,11 @@ type Props = {
 export const TopNav = ({ active, onChange, onSettings }: Props) => {
   const { t } = useSettings();
 
-  const tabs: { id: NavTab; icon: typeof Car; key: Parameters<typeof t>[0] }[] = [
-    { id: "voitures",   icon: Car,               key: "nav_voitures" },
-    { id: "catalogue",  icon: Package,            key: "nav_catalogue" },
-    { id: "caisse",     icon: ShoppingCart,       key: "nav_caisse" },
-    { id: "ventes",     icon: BarChart2,          key: "nav_ventes" },
-    { id: "dashboard",  icon: LayoutDashboard,    key: "nav_dashboard" },
+  const tabs: { id: NavTab; icon: typeof ShoppingCart; key: Parameters<typeof t>[0] }[] = [
+    { id: "catalogue",  icon: Package,         key: "nav_catalogue" },
+    { id: "caisse",     icon: ShoppingCart,    key: "nav_caisse" },
+    { id: "ventes",     icon: BarChart2,       key: "nav_ventes" },
+    { id: "dashboard",  icon: LayoutDashboard, key: "nav_dashboard" },
   ];
 
   return (
@@ -26,10 +25,10 @@ export const TopNav = ({ active, onChange, onSettings }: Props) => {
       {/* Brand */}
       <div className="mr-4 flex items-center gap-2 shrink-0">
         <div className="flex size-7 items-center justify-center rounded-[7px] bg-accent shadow-[0_2px_8px_rgba(245,158,11,0.4)]">
-          <Car size={13} strokeWidth={2.5} className="text-[#0b0b10]" />
+          <ShoppingCart size={13} strokeWidth={2.5} className="text-[#0b0b10]" />
         </div>
         <span className="font-display text-[13px] font-bold tracking-[0.08em] text-fg">
-          GARAGE
+          CAISSE
         </span>
       </div>
 

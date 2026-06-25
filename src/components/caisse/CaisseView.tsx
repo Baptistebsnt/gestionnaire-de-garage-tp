@@ -15,7 +15,7 @@ import { useSettings } from "../../context/SettingsContext";
 import { useToast } from "../Toast";
 import { cn } from "../../lib/cn";
 
-type NavTab = "voitures" | "catalogue" | "caisse" | "ventes";
+type NavTab = "catalogue" | "caisse" | "ventes" | "dashboard";
 
 type Props = {
   onNavigate: (tab: NavTab) => void;

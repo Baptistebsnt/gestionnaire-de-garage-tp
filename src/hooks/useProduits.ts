@@ -18,7 +18,7 @@ export const useProduits = () => {
     localStorage.setItem("garage_produits", JSON.stringify(produits));
   }, [produits]);
 
-  const addProduit = (data: { nom: string; prix: number }): Produit => {
+  const addProduit = (data: { nom: string; prix: number; barcode?: string; imageUrl?: string; marque?: string }): Produit => {
     const p: Produit = {
       ...data,
       id: crypto.randomUUID(),

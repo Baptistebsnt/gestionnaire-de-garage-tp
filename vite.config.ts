@@ -1,32 +1,42 @@
-import { defineConfig } from "vite";
+import { defineConfig } from "vitest/config";
 import tailwindcss from "@tailwindcss/vite";
 import path from "node:path";
-import electron from "vite-plugin-electron/simple";
 import react from "@vitejs/plugin-react";
 
-// https://vitejs.dev/config/
+const isTest = !!process.env.VITEST;
+
+// Electron plugin must not run during Vitest — dynamically import to avoid resolution errors
+const electronPlugins = isTest
+  ? []
+  : await (async () => {
+      const { default: electron } = await import("vite-plugin-electron/simple");
+      return [
+        electron({
+          main: { entry: "electron/main.ts" },
+          preload: { input: path.join(__dirname, "electron/preload.ts") },
+          renderer: {},
+        }),
+      ];
+    })();
+
 export default defineConfig({
-  plugins: [
-    tailwindcss(),
-    react(),
-    electron({
-      main: {
-        // Shortcut of `build.lib.entry`.
-        entry: "electron/main.ts",
-      },
-      preload: {
-        // Shortcut of `build.rollupOptions.input`.
-        // Preload scripts may contain Web assets, so use the `build.rollupOptions.input` instead `build.lib.entry`.
-        input: path.join(__dirname, "electron/preload.ts"),
-      },
-      // Ployfill the Electron and Node.js API for Renderer process.
-      // If you want use Node.js in Renderer process, the `nodeIntegration` needs to be enabled in the Main process.
-      // See 👉 https://github.com/electron-vite/vite-plugin-electron-renderer
-      renderer:
-        process.env.NODE_ENV === "test"
-          ? // https://github.com/electron-vite/vite-plugin-electron-renderer/issues/78#issuecomment-2053600808
-            undefined
-          : {},
-    }),
-  ],
+  plugins: [tailwindcss(), react(), ...electronPlugins],
+
+  test: {
+    globals: false,
+    environment: "happy-dom",
+    setupFiles: ["./src/test/setup.ts"],
+    include: ["src/**/__tests__/**/*.{test,spec}.{ts,tsx}"],
+    coverage: {
+      provider: "v8",
+      reporter: ["text", "html"],
+      include: ["src/**/*.{ts,tsx}"],
+      exclude: [
+        "src/**/__tests__/**",
+        "src/test/**",
+        "src/main.tsx",
+        "src/vite-env.d.ts",
+      ],
+    },
+  },
 });

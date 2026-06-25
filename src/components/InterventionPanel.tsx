@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { Plus, Trash2, Euro, X } from "lucide-react";
+import { Plus, Trash2, Euro, X, Printer } from "lucide-react";
 import { Voiture, Intervention } from "../types";
+import { printFacture } from "../lib/printFacture";
 
 interface Props {
   voiture: Voiture;
@@ -50,9 +51,20 @@ export const InterventionPanel = ({
             })}
           </p>
         </div>
-        <button className="btn-icon shrink-0 p-1.5 rounded-md text-fg-3 hover:bg-surface-2 hover:text-fg" onClick={onClose}>
-          <X size={15} />
-        </button>
+        <div className="flex shrink-0 items-center gap-1.5">
+          {interventions.length > 0 && (
+            <button
+              className="btn btn-ghost btn-sm"
+              onClick={() => printFacture(voiture, interventions)}
+              title="Imprimer la facture"
+            >
+              <Printer size={12} /> Facture
+            </button>
+          )}
+          <button className="btn-icon p-1.5 rounded-md text-fg-3 hover:bg-surface-2 hover:text-fg" onClick={onClose}>
+            <X size={15} />
+          </button>
+        </div>
       </div>
 
       {/* ── Body ── */}

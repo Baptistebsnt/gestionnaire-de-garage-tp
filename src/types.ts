@@ -43,6 +43,9 @@ export type Produit = {
   nom: string;
   prix: number;
   createdAt: string;
+  barcode?: string;
+  imageUrl?: string;
+  marque?: string;
 };
 
 export type LigneVente = {

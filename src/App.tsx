@@ -9,6 +9,7 @@ import { SettingsPanel } from "./components/SettingsPanel";
 import { CatalogueView } from "./components/catalogue/CatalogueView";
 import { CaisseView } from "./components/caisse/CaisseView";
 import { VentesView } from "./components/ventes/VentesView";
+import { DashboardView } from "./components/dashboard/DashboardView";
 
 const VoituresLayout = () => {
   const garage = useGarage();
@@ -97,10 +98,11 @@ const App = () => {
       />
 
       <div className="flex-1 overflow-hidden">
-        {tab === "voitures" && <VoituresLayout />}
+        {tab === "voitures"  && <VoituresLayout />}
         {tab === "catalogue" && <CatalogueView />}
-        {tab === "caisse" && <CaisseView onNavigate={setTab} />}
-        {tab === "ventes" && <VentesView />}
+        {tab === "caisse"    && <CaisseView onNavigate={setTab} />}
+        {tab === "ventes"    && <VentesView />}
+        {tab === "dashboard" && <DashboardView />}
       </div>
 
       {showSettings && <SettingsPanel onClose={() => setShowSettings(false)} />}

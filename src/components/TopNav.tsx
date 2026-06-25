@@ -1,8 +1,8 @@
-import { Car, Package, ShoppingCart, BarChart2, Settings } from "lucide-react";
+import { Car, Package, ShoppingCart, BarChart2, LayoutDashboard, Settings } from "lucide-react";
 import { useSettings } from "../context/SettingsContext";
 import { cn } from "../lib/cn";
 
-export type NavTab = "voitures" | "catalogue" | "caisse" | "ventes";
+export type NavTab = "voitures" | "catalogue" | "caisse" | "ventes" | "dashboard";
 
 type Props = {
   active: NavTab;
@@ -14,10 +14,11 @@ export const TopNav = ({ active, onChange, onSettings }: Props) => {
   const { t } = useSettings();
 
   const tabs: { id: NavTab; icon: typeof Car; key: Parameters<typeof t>[0] }[] = [
-    { id: "voitures",  icon: Car,          key: "nav_voitures" },
-    { id: "catalogue", icon: Package,      key: "nav_catalogue" },
-    { id: "caisse",    icon: ShoppingCart, key: "nav_caisse" },
-    { id: "ventes",    icon: BarChart2,    key: "nav_ventes" },
+    { id: "voitures",   icon: Car,               key: "nav_voitures" },
+    { id: "catalogue",  icon: Package,            key: "nav_catalogue" },
+    { id: "caisse",     icon: ShoppingCart,       key: "nav_caisse" },
+    { id: "ventes",     icon: BarChart2,          key: "nav_ventes" },
+    { id: "dashboard",  icon: LayoutDashboard,    key: "nav_dashboard" },
   ];
 
   return (
